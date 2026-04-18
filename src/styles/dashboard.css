@@ -1,0 +1,101 @@
+.dashboard-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  background: #f5f7f3;
+}
+
+.dashboard-shell__workspace {
+  position: relative;
+  min-width: 0;
+  padding: 20px 24px;
+}
+
+.dashboard-shell__main {
+  min-width: 0;
+  min-height: calc(100vh - 40px);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+}
+
+.dashboard-shell__content {
+  padding: 24px;
+}
+
+.dashboard-placeholder {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-height: 720px;
+  padding-right: clamp(84px, calc(var(--task-panel-width, 148px) * 0.45), 220px);
+}
+
+.dashboard-placeholder__intro h2 {
+  margin: 8px 0 12px;
+  font-size: 2rem;
+  color: #0f172a;
+}
+
+.dashboard-placeholder__intro p {
+  margin: 0;
+  max-width: 680px;
+  color: #526072;
+}
+
+.dashboard-placeholder__eyebrow {
+  margin: 0;
+  color: #2f855a;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dashboard-placeholder__canvas {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+  min-height: 580px;
+}
+
+.dashboard-placeholder__toolbar,
+.dashboard-placeholder__grid {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 24px;
+  background: #fcfdfb;
+}
+
+.dashboard-placeholder__toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px;
+  color: #526072;
+  font-weight: 600;
+}
+
+.dashboard-placeholder__grid {
+  display: grid;
+  grid-template-columns: 90px repeat(7, minmax(0, 1fr));
+  min-height: 500px;
+  overflow: hidden;
+}
+
+.dashboard-placeholder__column {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 20px 12px;
+  border-left: 1px solid rgba(148, 163, 184, 0.15);
+  color: #64748b;
+  font-weight: 600;
+}
+
+.dashboard-placeholder__column--time {
+  border-left: 0;
+  background: #f8faf7;
+}

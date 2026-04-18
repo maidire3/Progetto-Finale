@@ -1,0 +1,71 @@
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.topbar__eyebrow,
+.topbar__title {
+  margin: 0;
+}
+
+.topbar__eyebrow {
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.topbar__title {
+  margin-top: 6px;
+  font-size: 1.85rem;
+  color: #0f172a;
+}
+
+.user-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 999px;
+  background: #ffffff;
+  color: #0f172a;
+  cursor: pointer;
+}
+
+.user-badge__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #dff2e3;
+  color: #1f6f43;
+  font-weight: 700;
+}
+
+.user-badge__info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.user-badge__name,
+.user-badge__role {
+  line-height: 1.2;
+}
+
+.user-badge__name {
+  font-weight: 700;
+}
+
+.user-badge__role,
+.user-badge__chevron {
+  color: #64748b;
+  font-size: 0.9rem;
+}
