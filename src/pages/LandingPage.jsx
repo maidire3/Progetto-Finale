@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import '../styles/landing.css';
@@ -37,12 +38,12 @@ function LandingPage() {
             </p>
 
             <div className="hero__actions">
-              <a className="button button--primary" href="/register">
+              <Link className="button button--primary" to="/register">
                 Inizia ora
-              </a>
-              <a className="button button--secondary" href="/login">
+              </Link>
+              <Link className="button button--secondary" to="/login">
                 Vai al login
-              </a>
+              </Link>
             </div>
           </div>
 

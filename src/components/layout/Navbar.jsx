@@ -1,19 +1,20 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 function Navbar() {
   return (
     <header className="navbar">
-      <a className="navbar__logo" href="/">
+      <Link className="navbar__logo" to="/">
         Study Tracker
-      </a>
+      </Link>
 
       <nav className="navbar__actions" aria-label="Navigazione principale">
-        <a className="button button--ghost" href="/login">
+        <Link className="button button--ghost" to="/login">
           Login
-        </a>
-        <a className="button button--primary" href="/register">
+        </Link>
+        <Link className="button button--primary" to="/register">
           Register
-        </a>
+        </Link>
       </nav>
     </header>
   );
