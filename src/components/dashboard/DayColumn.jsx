@@ -9,8 +9,14 @@ function DayColumn({ day, hours }) {
       }`}
     >
       <header className="weekly-calendar__day-header">
-        <p className="weekly-calendar__day-name">{day.label}</p>
-        <p className="weekly-calendar__day-number">{day.dayNumber}</p>
+        <div className="weekly-calendar__day-header-main">
+          <p className="weekly-calendar__day-name">{day.label}</p>
+          <p className="weekly-calendar__day-number">{day.dayNumber}</p>
+        </div>
+
+        {day.isToday ? (
+          <span className="weekly-calendar__today-label">Today</span>
+        ) : null}
       </header>
 
       <div className="weekly-calendar__day-body">

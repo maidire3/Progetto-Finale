@@ -8,7 +8,7 @@ function TimeColumn({ hours }) {
       <div className="weekly-calendar__time-slots">
         {hours.map((hour) => (
           <div className="weekly-calendar__time-slot" key={hour}>
-            {`${String(hour).padStart(2, '0')}:00`}
+            <span>{`${String(hour).padStart(2, '0')}:00`}</span>
           </div>
         ))}
       </div>

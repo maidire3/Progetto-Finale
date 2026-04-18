@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import DayColumn from './DayColumn';
 import TimeColumn from './TimeColumn';
 import mockCalendarTasks from '../../data/mockCalendarData';
@@ -20,10 +20,10 @@ function isSameDay(firstDate, secondDate) {
   );
 }
 
-function createWeekDays() {
+function createWeekDays(weekOffset) {
   const today = new Date();
   const startDate = new Date(today);
-  startDate.setDate(today.getDate() - 1);
+  startDate.setDate(today.getDate() - 1 + weekOffset * 7);
 
   return Array.from({ length: 7 }, (_, index) => {
     const currentDate = new Date(startDate);
@@ -52,19 +52,40 @@ function getWeekLabel(days) {
 }
 
 function WeeklyCalendar() {
-  const days = createWeekDays();
+  const [weekOffset, setWeekOffset] = useState(0);
+  const days = createWeekDays(weekOffset);
   const weekLabel = getWeekLabel(days);
+
+  function handlePreviousWeek() {
+    setWeekOffset((currentValue) => currentValue - 1);
+  }
+
+  function handleNextWeek() {
+    setWeekOffset((currentValue) => currentValue + 1);
+  }
+
+  function handleGoToToday() {
+    setWeekOffset(0);
+  }
 
   return (
     <section className="weekly-calendar">
       <div className="weekly-calendar__toolbar">
         <div className="weekly-calendar__toolbar-nav">
-          <button type="button">{'<'}</button>
+          <button type="button" onClick={handlePreviousWeek}>
+            {'<'}
+          </button>
           <p>{weekLabel}</p>
-          <button type="button">{'>'}</button>
+          <button type="button" onClick={handleNextWeek}>
+            {'>'}
+          </button>
         </div>
 
-        <button className="weekly-calendar__today-button" type="button">
+        <button
+          className="weekly-calendar__today-button"
+          type="button"
+          onClick={handleGoToToday}
+        >
           Today
         </button>
       </div>

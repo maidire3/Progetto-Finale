@@ -15,8 +15,8 @@ function TaskBlock({ task }) {
         height: `${height}px`
       }}
     >
-      <p className="calendar-task-block__subject">{task.subject}</p>
       <h4>{task.title}</h4>
+      <p className="calendar-task-block__subject">{task.subject}</p>
       <p className="calendar-task-block__time">
         {`${String(task.startHour).padStart(2, '0')}:00 - ${String(
           task.endHour
