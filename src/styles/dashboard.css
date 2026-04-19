@@ -9,6 +9,7 @@
   position: relative;
   min-width: 0;
   padding: 20px 24px;
+  overflow-x: clip;
 }
 
 .dashboard-shell__main {
@@ -30,7 +31,6 @@
   flex-direction: column;
   gap: 24px;
   min-height: 720px;
-  padding-right: clamp(84px, calc(var(--task-panel-width, 148px) * 0.45), 220px);
 }
 
 .dashboard-placeholder__intro h2 {
@@ -59,7 +59,6 @@
   flex-direction: column;
   gap: 24px;
   min-height: 720px;
-  padding-right: clamp(84px, calc(var(--task-panel-width, 148px) * 0.45), 220px);
 }
 
 .section-page__header {

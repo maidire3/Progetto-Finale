@@ -7,14 +7,15 @@ const user = {
   initial: 'D'
 };
 
-const COMPACT_PANEL_WIDTH = 148;
-
 function DashboardSectionLayout({ title, eyebrow = 'Study Tracker', children }) {
-  const [isTaskPanelExpanded, setIsTaskPanelExpanded] = useState(false);
-  const [taskPanelWidth, setTaskPanelWidth] = useState(COMPACT_PANEL_WIDTH);
+  const [isTaskPanelOpen, setIsTaskPanelOpen] = useState(false);
 
-  function handleToggleTaskPanel() {
-    setIsTaskPanelExpanded((currentValue) => !currentValue);
+  function handleOpenTaskPanel() {
+    setIsTaskPanelOpen(true);
+  }
+
+  function handleCloseTaskPanel() {
+    setIsTaskPanelOpen(false);
   }
 
   return (
@@ -23,10 +24,9 @@ function DashboardSectionLayout({ title, eyebrow = 'Study Tracker', children }) 
       user={user}
       topbarTitle={title}
       topbarEyebrow={eyebrow}
-      isTaskPanelExpanded={isTaskPanelExpanded}
-      onToggleTaskPanel={handleToggleTaskPanel}
-      taskPanelWidth={taskPanelWidth}
-      onTaskPanelWidthChange={setTaskPanelWidth}
+      isTaskPanelOpen={isTaskPanelOpen}
+      onOpenTaskPanel={handleOpenTaskPanel}
+      onCloseTaskPanel={handleCloseTaskPanel}
     >
       {children}
     </AppShell>

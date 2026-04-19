@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
 import TaskPanel from '../dashboard/TaskPanel';
@@ -8,17 +9,16 @@ function AppShell({
   user,
   topbarTitle,
   topbarEyebrow,
-  isTaskPanelExpanded,
-  onToggleTaskPanel,
-  taskPanelWidth,
-  onTaskPanelWidthChange,
+  isTaskPanelOpen,
+  onOpenTaskPanel,
+  onCloseTaskPanel,
   children
 }) {
+  const location = useLocation();
+  const showTaskPanel = location.pathname === '/dashboard';
+
   return (
-    <div
-      className="dashboard-shell"
-      style={{ '--task-panel-width': `${taskPanelWidth}px` }}
-    >
+    <div className="dashboard-shell">
       <Sidebar sections={sidebarSections} />
 
       <div className="dashboard-shell__workspace">
@@ -27,11 +27,13 @@ function AppShell({
           <div className="dashboard-shell__content">{children}</div>
         </main>
 
-        <TaskPanel
-          isExpanded={isTaskPanelExpanded}
-          onToggle={onToggleTaskPanel}
-          onWidthChange={onTaskPanelWidthChange}
-        />
+        {showTaskPanel ? (
+          <TaskPanel
+            isOpen={isTaskPanelOpen}
+            onOpen={onOpenTaskPanel}
+            onClose={onCloseTaskPanel}
+          />
+        ) : null}
       </div>
     </div>
   );

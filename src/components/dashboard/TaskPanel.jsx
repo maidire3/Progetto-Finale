@@ -1,128 +1,79 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 
-const compactTasks = [
-  'Ripasso Analisi 2',
-  'Terminare appunti di Fisica',
-  'Preparare quiz di Statistica'
+const focusTasks = [
+  {
+    id: 'focus-1',
+    title: 'Ripasso Analisi 2',
+    meta: 'Oggi, 10:00 - Priorita media'
+  },
+  {
+    id: 'focus-2',
+    title: 'Terminare appunti di Fisica',
+    meta: 'Domani, 08:30 - Priorita alta'
+  },
+  {
+    id: 'focus-3',
+    title: 'Preparare quiz di Statistica',
+    meta: 'Venerdi, 14:00 - Priorita media'
+  }
 ];
 
-const COMPACT_WIDTH = 148;
-const MIN_EXPANDED_WIDTH = 320;
-const MAX_EXPANDED_WIDTH = 520;
-const DEFAULT_EXPANDED_WIDTH = 400;
-
-function clampWidth(width) {
-  return Math.min(MAX_EXPANDED_WIDTH, Math.max(MIN_EXPANDED_WIDTH, width));
-}
-
-function TaskPanel({ isExpanded, onToggle, onWidthChange }) {
-  const [expandedWidth, setExpandedWidth] = useState(DEFAULT_EXPANDED_WIDTH);
-  const [isResizing, setIsResizing] = useState(false);
-  const panelRef = useRef(null);
-  const resizeStateRef = useRef({
-    startX: 0,
-    startWidth: DEFAULT_EXPANDED_WIDTH
-  });
-
-  useEffect(() => {
-    if (typeof onWidthChange === 'function') {
-      onWidthChange(isExpanded ? expandedWidth : COMPACT_WIDTH);
-    }
-  }, [expandedWidth, isExpanded, onWidthChange]);
-
-  useEffect(() => {
-    if (!isResizing) {
-      return undefined;
-    }
-
-    function handleMouseMove(event) {
-      const deltaX = resizeStateRef.current.startX - event.clientX;
-      const nextWidth = clampWidth(resizeStateRef.current.startWidth + deltaX);
-      setExpandedWidth(nextWidth);
-    }
-
-    function handleMouseUp() {
-      setIsResizing(false);
-    }
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isResizing]);
-
-  function handleResizeStart(event) {
-    if (!isExpanded) {
-      return;
-    }
-
-    resizeStateRef.current = {
-      startX: event.clientX,
-      startWidth: expandedWidth
-    };
-
-    setIsResizing(true);
-  }
-
-  const panelWidth = isExpanded ? expandedWidth : COMPACT_WIDTH;
-
+function TaskPanel({ isOpen, onOpen, onClose }) {
   return (
-    <aside
-      ref={panelRef}
-      className={`task-panel ${isExpanded ? 'task-panel--expanded' : ''} ${
-        isResizing ? 'task-panel--resizing' : ''
-      }`}
-      aria-label="Task panel"
-      style={{
-        width: `${panelWidth}px`,
-        minWidth: isExpanded ? `${MIN_EXPANDED_WIDTH}px` : `${COMPACT_WIDTH}px`,
-        maxWidth: isExpanded ? `${MAX_EXPANDED_WIDTH}px` : `${COMPACT_WIDTH}px`
-      }}
-    >
+    <>
       <button
-        className={`task-panel__resize-handle ${
-          isExpanded ? 'task-panel__resize-handle--active' : ''
-        }`}
+        className={`task-panel-trigger ${isOpen ? 'task-panel-trigger--hidden' : ''}`}
         type="button"
-        aria-label="Ridimensiona task panel"
-        onMouseDown={handleResizeStart}
+        aria-label="Apri task panel"
+        onClick={onOpen}
+      >
+        <span className="task-panel-trigger__icon" aria-hidden="true">
+          +
+        </span>
+        <span className="task-panel-trigger__eyebrow">Focus</span>
+        <span className="task-panel-trigger__title">Task</span>
+      </button>
+
+      <div
+        className={`task-panel-overlay ${isOpen ? 'task-panel-overlay--visible' : ''}`}
+        role="presentation"
+        onClick={onClose}
       />
 
-      <div className="task-panel__header">
-        <div>
-          <p className="task-panel__eyebrow">Focus</p>
-          <h2>Task list</h2>
+      <aside
+        className={`task-sidebar ${isOpen ? 'task-sidebar--open' : ''}`}
+        aria-hidden={!isOpen}
+        aria-label="Task panel"
+      >
+        <div className="task-sidebar__header">
+          <div>
+            <p className="task-sidebar__eyebrow">Focus</p>
+            <h2>Task List</h2>
+          </div>
+
+          <button className="task-sidebar__close" type="button" onClick={onClose}>
+            Chiudi
+          </button>
         </div>
 
-        <button className="task-panel__toggle" type="button" onClick={onToggle}>
-          {isExpanded ? 'Riduci' : 'Espandi'}
-        </button>
-      </div>
+        <p className="task-sidebar__description">
+          Una vista rapida delle task piu importanti della settimana, sempre a
+          portata di click senza occupare spazio fisso nella dashboard.
+        </p>
 
-      {isExpanded ? (
-        <div className="task-panel__body">
-          <p className="task-panel__description">
-            Vista espansa del pannello task. Qui inseriremo task piu leggibili,
-            dettagli e stato di avanzamento.
-          </p>
-
-          <ul className="task-panel__list">
-            {compactTasks.map((task) => (
-              <li className="task-panel__item" key={task}>
-                <span className="task-panel__dot" aria-hidden="true" />
-                <div>
-                  <p className="task-panel__item-title">{task}</p>
-                  <p className="task-panel__item-meta">Oggi - Priorita media</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-    </aside>
+        <ul className="task-sidebar__list">
+          {focusTasks.map((task) => (
+            <li className="task-sidebar__item" key={task.id}>
+              <span className="task-sidebar__dot" aria-hidden="true" />
+              <div>
+                <p className="task-sidebar__item-title">{task.title}</p>
+                <p className="task-sidebar__item-meta">{task.meta}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </aside>
+    </>
   );
 }
 
