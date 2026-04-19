@@ -1,15 +1,23 @@
 const sidebarSections = [
   {
     title: 'Overview',
-    items: ['Dashboard', 'Search']
+    items: [
+      { label: 'Dashboard', path: '/dashboard' },
+      { label: 'Search', path: '/search' }
+    ]
   },
   {
     title: 'Study',
-    items: ['Materie', 'Task', 'Esami', 'Appunti']
+    items: [
+      { label: 'Materie', path: '/subjects' },
+      { label: 'Task', path: '/tasks' },
+      { label: 'Esami', path: '/exams' },
+      { label: 'Appunti', path: '/notes' }
+    ]
   },
   {
     title: 'Account',
-    items: ['Settings']
+    items: [{ label: 'Settings', path: '/settings' }]
   }
 ];
 

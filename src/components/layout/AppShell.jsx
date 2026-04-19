@@ -6,6 +6,8 @@ import TaskPanel from '../dashboard/TaskPanel';
 function AppShell({
   sidebarSections,
   user,
+  topbarTitle,
+  topbarEyebrow,
   isTaskPanelExpanded,
   onToggleTaskPanel,
   taskPanelWidth,
@@ -21,7 +23,7 @@ function AppShell({
 
       <div className="dashboard-shell__workspace">
         <main className="dashboard-shell__main">
-          <Topbar user={user} />
+          <Topbar user={user} title={topbarTitle} eyebrow={topbarEyebrow} />
           <div className="dashboard-shell__content">{children}</div>
         </main>
 

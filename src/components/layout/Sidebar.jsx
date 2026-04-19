@@ -1,15 +1,16 @@
 import React from 'react';
+import { Link, NavLink } from 'react-router-dom';
 
 function Sidebar({ sections }) {
   return (
     <aside className="sidebar">
-      <div className="sidebar__brand">
+      <Link className="sidebar__brand" to="/dashboard">
         <span className="sidebar__brand-mark">S</span>
         <div>
           <p className="sidebar__brand-name">Study Tracker</p>
           <p className="sidebar__brand-caption">Desktop dashboard</p>
         </div>
-      </div>
+      </Link>
 
       <nav className="sidebar__nav" aria-label="Sidebar navigation">
         {sections.map((section) => (
@@ -18,15 +19,15 @@ function Sidebar({ sections }) {
 
             <ul className="sidebar__list">
               {section.items.map((item) => (
-                <li key={item}>
-                  <button
-                    className={`sidebar__item ${
-                      item === 'Dashboard' ? 'sidebar__item--active' : ''
-                    }`}
-                    type="button"
+                <li key={item.path}>
+                  <NavLink
+                    className={({ isActive }) =>
+                      `sidebar__item ${isActive ? 'sidebar__item--active' : ''}`
+                    }
+                    to={item.path}
                   >
-                    {item}
-                  </button>
+                    {item.label}
+                  </NavLink>
                 </li>
               ))}
             </ul>
