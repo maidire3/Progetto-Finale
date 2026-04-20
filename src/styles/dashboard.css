@@ -732,8 +732,9 @@
 .weekly-calendar__grid {
   display: grid;
   grid-template-columns: 90px repeat(7, minmax(0, 1fr));
-  min-height: 1220px;
-  overflow: hidden;
+  max-height: 760px;
+  overflow-y: auto;
+  overflow-x: hidden;
   box-shadow: 0 18px 38px rgba(15, 23, 42, 0.04);
 }
 
@@ -744,8 +745,15 @@
 
 .weekly-calendar__corner,
 .weekly-calendar__day-header {
+  position: sticky;
+  top: 0;
   height: 82px;
   border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  z-index: 2;
+}
+
+.weekly-calendar__corner {
+  background: linear-gradient(180deg, #fafcf9 0%, #f7faf8 100%);
 }
 
 .weekly-calendar__time-slots {
@@ -789,6 +797,12 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 14px 14px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(8px);
+}
+
+.weekly-calendar__day-column--today .weekly-calendar__day-header {
+  background: rgba(240, 249, 243, 0.96);
 }
 
 .weekly-calendar__day-header-main {
