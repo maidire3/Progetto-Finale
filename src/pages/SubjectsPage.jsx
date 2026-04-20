@@ -1,62 +1,16 @@
 import React, { useMemo, useState } from 'react';
 import DashboardSectionLayout from '../components/layout/DashboardSectionLayout';
+import { useStudyData } from '../context/StudyDataContext';
+import {
+  COLOR_OPTIONS,
+  INITIAL_SUBJECTS,
+  WEEK_DAYS,
+  formatSubjectSchedule
+} from '../data/studyData';
 import '../styles/dashboard.css';
 import '../styles/sidebar.css';
 import '../styles/topbar.css';
 import '../styles/task-panel.css';
-
-const COLOR_OPTIONS = [
-  { value: 'sage', label: 'Salvia' },
-  { value: 'sky', label: 'Azzurro' },
-  { value: 'sand', label: 'Sabbia' },
-  { value: 'rose', label: 'Rosa' }
-];
-
-const WEEK_DAYS = [
-  { value: 'mon', label: 'Lun' },
-  { value: 'tue', label: 'Mar' },
-  { value: 'wed', label: 'Mer' },
-  { value: 'thu', label: 'Gio' },
-  { value: 'fri', label: 'Ven' },
-  { value: 'sat', label: 'Sab' },
-  { value: 'sun', label: 'Dom' }
-];
-
-const INITIAL_SUBJECTS = [
-  {
-    id: 'analisi-2',
-    name: 'Analisi 2',
-    description: 'Ripasso formule e sessioni esercizi in aula studio.',
-    color: 'sage',
-    taskCount: 4,
-    scheduleEnabled: true,
-    scheduleDays: ['mon', 'wed'],
-    startTime: '09:00',
-    endTime: '11:00'
-  },
-  {
-    id: 'basi-di-dati',
-    name: 'Basi di dati',
-    description: 'Laboratorio SQL e progettazione relazionale.',
-    color: 'sky',
-    taskCount: 3,
-    scheduleEnabled: true,
-    scheduleDays: ['tue'],
-    startTime: '14:00',
-    endTime: '16:00'
-  },
-  {
-    id: 'statistica',
-    name: 'Statistica',
-    description: 'Esercizi guidati e simulazioni in vista dell esame.',
-    color: 'sand',
-    taskCount: 5,
-    scheduleEnabled: false,
-    scheduleDays: [],
-    startTime: '10:00',
-    endTime: '12:00'
-  }
-];
 
 const EMPTY_FORM = {
   id: '',
@@ -68,19 +22,8 @@ const EMPTY_FORM = {
   endTime: '11:00'
 };
 
-function formatSchedule(subject) {
-  if (!subject.scheduleEnabled || subject.scheduleDays.length === 0) {
-    return 'Nessuna programmazione settimanale';
-  }
-
-  const labels = WEEK_DAYS.filter((day) =>
-    subject.scheduleDays.includes(day.value)
-  ).map((day) => day.label);
-
-  return `${labels.join(', ')} - ${subject.startTime} - ${subject.endTime}`;
-}
-
 function SubjectsPage() {
+  const { tasks } = useStudyData();
   const [subjects, setSubjects] = useState(INITIAL_SUBJECTS);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingSubjectId, setEditingSubjectId] = useState(null);
@@ -270,7 +213,9 @@ function SubjectsPage() {
               <p className="subject-card__description">{subject.description}</p>
 
               <div className="subject-card__meta-row">
-                <span className="subject-card__pill">{subject.taskCount} task attive</span>
+                <span className="subject-card__pill">
+                  {tasks.filter((task) => task.subject === subject.name).length} task attive
+                </span>
                 <span className="subject-card__pill subject-card__pill--secondary">
                   {COLOR_OPTIONS.find((option) => option.value === subject.color)?.label}
                 </span>
@@ -278,7 +223,9 @@ function SubjectsPage() {
 
               <div className="subject-card__schedule">
                 <p className="subject-card__schedule-label">Programmazione</p>
-                <p className="subject-card__schedule-value">{formatSchedule(subject)}</p>
+                <p className="subject-card__schedule-value">
+                  {formatSubjectSchedule(subject)}
+                </p>
               </div>
             </article>
           ))}

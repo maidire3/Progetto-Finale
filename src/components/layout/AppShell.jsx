@@ -12,6 +12,7 @@ function AppShell({
   isTaskPanelOpen,
   onOpenTaskPanel,
   onCloseTaskPanel,
+  taskPanelItems,
   children
 }) {
   const location = useLocation();
@@ -32,6 +33,7 @@ function AppShell({
             isOpen={isTaskPanelOpen}
             onOpen={onOpenTaskPanel}
             onClose={onCloseTaskPanel}
+            items={taskPanelItems}
           />
         ) : null}
       </div>

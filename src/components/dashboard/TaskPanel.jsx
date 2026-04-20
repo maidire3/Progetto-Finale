@@ -1,24 +1,77 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
+import { TASK_SUBJECT_OPTIONS } from '../../data/studyData';
+import { useStudyData } from '../../context/StudyDataContext';
 
-const focusTasks = [
-  {
-    id: 'focus-1',
-    title: 'Ripasso Analisi 2',
-    meta: 'Oggi, 10:00 - Priorita media'
-  },
-  {
-    id: 'focus-2',
-    title: 'Terminare appunti di Fisica',
-    meta: 'Domani, 08:30 - Priorita alta'
-  },
-  {
-    id: 'focus-3',
-    title: 'Preparare quiz di Statistica',
-    meta: 'Venerdi, 14:00 - Priorita media'
+function TaskPanel({ isOpen, onOpen, onClose, items = [] }) {
+  const { addTask, tasks } = useStudyData();
+  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [formValues, setFormValues] = useState({
+    title: '',
+    subject: TASK_SUBJECT_OPTIONS[0],
+    dueDate: '',
+    startTime: ''
+  });
+
+  const openTasks = useMemo(
+    () => tasks.filter((task) => task.status !== 'Completato'),
+    [tasks]
+  );
+
+  function toggleForm() {
+    setIsFormVisible((currentValue) => !currentValue);
   }
-];
 
-function TaskPanel({ isOpen, onOpen, onClose }) {
+  function handleFieldChange(event) {
+    const { name, value } = event.target;
+    setFormValues((currentValues) => ({
+      ...currentValues,
+      [name]: value
+    }));
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault();
+
+    const trimmedTitle = formValues.title.trim();
+
+    if (!trimmedTitle) {
+      return;
+    }
+
+    addTask({
+      title: trimmedTitle,
+      subject: formValues.subject,
+      dueDate: formValues.dueDate,
+      status: 'Da fare',
+      dayOffset: 0,
+      startHour:
+        formValues.dueDate && formValues.startTime
+          ? Number(formValues.startTime.split(':')[0])
+          : null,
+      endHour:
+        formValues.dueDate && formValues.startTime
+          ? Math.min(Number(formValues.startTime.split(':')[0]) + 1, 24)
+          : null
+    });
+
+    setFormValues({
+      title: '',
+      subject: TASK_SUBJECT_OPTIONS[0],
+      dueDate: '',
+      startTime: ''
+    });
+    setIsFormVisible(false);
+  }
+
+  const visibleItems =
+    items.length > 0
+      ? items
+      : openTasks.map((task) => ({
+          id: task.id,
+          title: task.title,
+          meta: `${task.subject} - ${task.dueDate}`
+        }));
+
   return (
     <>
       <button
@@ -61,8 +114,75 @@ function TaskPanel({ isOpen, onOpen, onClose }) {
           portata di click senza occupare spazio fisso nella dashboard.
         </p>
 
+        <div className="task-sidebar__actions">
+          <button className="task-sidebar__primary-button" type="button" onClick={toggleForm}>
+            {isFormVisible ? 'Chiudi form' : '+ Nuovo task'}
+          </button>
+          <span className="task-sidebar__count">{openTasks.length} task aperte</span>
+        </div>
+
+        {isFormVisible ? (
+          <form className="task-sidebar__form" onSubmit={handleSubmit}>
+            <div className="task-sidebar__form-group">
+              <label htmlFor="task-panel-title">Titolo</label>
+              <input
+                id="task-panel-title"
+                name="title"
+                type="text"
+                value={formValues.title}
+                onChange={handleFieldChange}
+                required
+              />
+            </div>
+
+            <div className="task-sidebar__form-row">
+              <div className="task-sidebar__form-group">
+                <label htmlFor="task-panel-subject">Materia</label>
+                <select
+                  id="task-panel-subject"
+                  name="subject"
+                  value={formValues.subject}
+                  onChange={handleFieldChange}
+                >
+                  {TASK_SUBJECT_OPTIONS.map((subject) => (
+                    <option key={subject} value={subject}>
+                      {subject}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="task-sidebar__form-group">
+                <label htmlFor="task-panel-date">Scadenza</label>
+                <input
+                  id="task-panel-date"
+                  name="dueDate"
+                  type="date"
+                  value={formValues.dueDate}
+                  onChange={handleFieldChange}
+                />
+              </div>
+            </div>
+
+            <div className="task-sidebar__form-group">
+              <label htmlFor="task-panel-time">Orario calendario facoltativo</label>
+              <input
+                id="task-panel-time"
+                name="startTime"
+                type="time"
+                value={formValues.startTime}
+                onChange={handleFieldChange}
+              />
+            </div>
+
+            <button className="task-sidebar__submit" type="submit">
+              Aggiungi task
+            </button>
+          </form>
+        ) : null}
+
         <ul className="task-sidebar__list">
-          {focusTasks.map((task) => (
+          {visibleItems.map((task) => (
             <li className="task-sidebar__item" key={task.id}>
               <span className="task-sidebar__dot" aria-hidden="true" />
               <div>

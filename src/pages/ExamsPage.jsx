@@ -1,17 +1,10 @@
 import React, { useMemo, useState } from 'react';
 import DashboardSectionLayout from '../components/layout/DashboardSectionLayout';
+import { EXAM_SUBJECT_OPTIONS, INITIAL_EXAMS } from '../data/studyData';
 import '../styles/dashboard.css';
 import '../styles/sidebar.css';
 import '../styles/topbar.css';
 import '../styles/task-panel.css';
-
-const EXAM_SUBJECT_OPTIONS = ['Analisi 2', 'Statistica', 'Basi di dati', 'Programmazione'];
-
-const INITIAL_EXAMS = [
-  { id: 'exam-1', subject: 'Analisi 2', date: '2026-05-12', location: 'Aula A2' },
-  { id: 'exam-2', subject: 'Statistica', date: '2026-05-20', location: 'Laboratorio 3' },
-  { id: 'exam-3', subject: 'Basi di dati', date: '2026-06-03', location: 'Aula Magna' }
-];
 
 const EMPTY_EXAM_FORM = {
   id: '',

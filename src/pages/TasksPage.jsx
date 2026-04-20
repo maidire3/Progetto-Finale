@@ -1,47 +1,23 @@
 import React, { useMemo, useState } from 'react';
 import DashboardSectionLayout from '../components/layout/DashboardSectionLayout';
+import { TASK_STATUS_OPTIONS, TASK_SUBJECT_OPTIONS } from '../data/studyData';
+import { useStudyData } from '../context/StudyDataContext';
 import '../styles/dashboard.css';
 import '../styles/sidebar.css';
 import '../styles/topbar.css';
 import '../styles/task-panel.css';
-
-const TASK_STATUS_OPTIONS = ['Da fare', 'In corso', 'Completato'];
-const TASK_SUBJECT_OPTIONS = ['Analisi 2', 'Statistica', 'Basi di dati', 'Programmazione'];
-
-const INITIAL_TASKS = [
-  {
-    id: 'task-1',
-    title: 'Ripasso limiti',
-    status: 'In corso',
-    subject: 'Analisi 2',
-    dueDate: '2026-04-21'
-  },
-  {
-    id: 'task-2',
-    title: 'Quiz settimanale',
-    status: 'Da fare',
-    subject: 'Statistica',
-    dueDate: '2026-04-23'
-  },
-  {
-    id: 'task-3',
-    title: 'Esercizi SQL',
-    status: 'Completato',
-    subject: 'Basi di dati',
-    dueDate: '2026-04-18'
-  }
-];
 
 const EMPTY_TASK_FORM = {
   id: '',
   title: '',
   status: 'Da fare',
   subject: 'Analisi 2',
-  dueDate: '2026-04-25'
+  dueDate: '',
+  startTime: ''
 };
 
 function TasksPage() {
-  const [tasks, setTasks] = useState(INITIAL_TASKS);
+  const { tasks, addTask, updateTask, deleteTask } = useStudyData();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [formValues, setFormValues] = useState(EMPTY_TASK_FORM);
@@ -59,7 +35,13 @@ function TasksPage() {
 
   function openEditModal(task) {
     setEditingTaskId(task.id);
-    setFormValues(task);
+    setFormValues({
+      ...task,
+      dueDate: task.dueDate || '',
+      startTime: Number.isFinite(task.startHour)
+        ? `${String(task.startHour).padStart(2, '0')}:00`
+        : ''
+    });
     setIsModalOpen(true);
   }
 
@@ -91,17 +73,24 @@ function TasksPage() {
       title: trimmedTitle,
       status: formValues.status,
       subject: formValues.subject,
-      dueDate: formValues.dueDate
+      dueDate: formValues.dueDate,
+      startHour:
+        formValues.dueDate && formValues.startTime
+          ? Number(formValues.startTime.split(':')[0])
+          : null,
+      endHour:
+        formValues.dueDate && formValues.startTime
+          ? Math.min(Number(formValues.startTime.split(':')[0]) + 1, 24)
+          : null
     };
 
     if (editingTask) {
-      setTasks((currentTasks) =>
-        currentTasks.map((task) =>
-          task.id === editingTask.id ? { ...task, ...payload } : task
-        )
-      );
+      updateTask(editingTask.id, payload);
     } else {
-      setTasks((currentTasks) => [...currentTasks, payload]);
+      addTask({
+        ...payload,
+        dayOffset: 0
+      });
     }
 
     closeModal();
@@ -118,7 +107,7 @@ function TasksPage() {
       return;
     }
 
-    setTasks((currentTasks) => currentTasks.filter((task) => task.id !== taskId));
+    deleteTask(taskId);
   }
 
   return (
@@ -148,7 +137,15 @@ function TasksPage() {
               <div>
                 <h3>{task.title}</h3>
                 <p>{task.subject}</p>
-                <p className="section-list__meta">Scadenza: {task.dueDate}</p>
+                <p className="section-list__meta">
+                  {task.dueDate
+                    ? `Scadenza: ${task.dueDate}${
+                        Number.isFinite(task.startHour)
+                          ? ` alle ${String(task.startHour).padStart(2, '0')}:00`
+                          : ''
+                      }`
+                    : 'Nessuna pianificazione in calendario'}
+                </p>
               </div>
 
               <div className="section-list__actions">
@@ -243,6 +240,17 @@ function TasksPage() {
                   name="dueDate"
                   type="date"
                   value={formValues.dueDate}
+                  onChange={handleFieldChange}
+                />
+              </div>
+
+              <div className="entity-form__group">
+                <label htmlFor="task-time">Orario calendario facoltativo</label>
+                <input
+                  id="task-time"
+                  name="startTime"
+                  type="time"
+                  value={formValues.startTime}
                   onChange={handleFieldChange}
                 />
               </div>

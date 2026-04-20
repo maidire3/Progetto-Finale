@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import DayColumn from './DayColumn';
 import TimeColumn from './TimeColumn';
-import mockCalendarTasks from '../../data/mockCalendarData';
+import { getSubjectStyle, INITIAL_SUBJECTS, INITIAL_TASKS } from '../../data/studyData';
 
 const HOURS = [
   6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24
@@ -12,6 +12,20 @@ const RANGE_FORMATTER = new Intl.DateTimeFormat('it-IT', {
   month: 'short'
 });
 
+function parseDateString(value) {
+  if (!value) {
+    return null;
+  }
+
+  const [year, month, day] = value.split('-').map(Number);
+
+  if (!year || !month || !day) {
+    return null;
+  }
+
+  return new Date(year, month - 1, day);
+}
+
 function isSameDay(firstDate, secondDate) {
   return (
     firstDate.getFullYear() === secondDate.getFullYear() &&
@@ -20,7 +34,7 @@ function isSameDay(firstDate, secondDate) {
   );
 }
 
-function createWeekDays(weekOffset) {
+function createWeekDays(weekOffset, tasks, subjects) {
   const today = new Date();
   const startDate = new Date(today);
   startDate.setDate(today.getDate() - 1 + weekOffset * 7);
@@ -29,8 +43,19 @@ function createWeekDays(weekOffset) {
     const currentDate = new Date(startDate);
     currentDate.setDate(startDate.getDate() + index);
 
-    const dayTasks =
-      mockCalendarTasks.find((entry) => entry.dayOffset === index)?.tasks || [];
+    const dayTasks = tasks
+      .filter((task) => {
+        const taskDate = parseDateString(task.dueDate);
+        const hasCalendarTime =
+          Number.isFinite(task.startHour) && Number.isFinite(task.endHour);
+
+        return taskDate && hasCalendarTime ? isSameDay(taskDate, currentDate) : false;
+      })
+      .sort((firstTask, secondTask) => firstTask.startHour - secondTask.startHour)
+      .map((task) => ({
+        ...task,
+        colorStyle: getSubjectStyle(task.subject, subjects)
+      }));
 
     return {
       key: currentDate.toISOString(),
@@ -51,9 +76,12 @@ function getWeekLabel(days) {
   )}`;
 }
 
-function WeeklyCalendar() {
+function WeeklyCalendar({
+  tasks = INITIAL_TASKS,
+  subjects = INITIAL_SUBJECTS
+}) {
   const [weekOffset, setWeekOffset] = useState(0);
-  const days = createWeekDays(weekOffset);
+  const days = createWeekDays(weekOffset, tasks, subjects);
   const weekLabel = getWeekLabel(days);
 
   function handlePreviousWeek() {
