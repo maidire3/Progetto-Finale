@@ -846,8 +846,7 @@
   flex-direction: column;
 }
 
-.weekly-calendar__time-slot,
-.weekly-calendar__hour-row {
+.weekly-calendar__time-slot {
   height: 66px;
   border-bottom: 1px solid rgba(148, 163, 184, 0.09);
 }
@@ -933,22 +932,50 @@
   position: relative;
 }
 
+.weekly-calendar__hour-row {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: 66px;
+  margin: 0;
+  padding: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.09);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.weekly-calendar__hour-row:hover {
+  background: rgba(47, 133, 90, 0.05);
+}
+
 .weekly-calendar__task-layer {
   position: absolute;
   inset: 0;
   padding: 8px;
+  pointer-events: none;
 }
 
 .calendar-task-block {
   position: absolute;
+  z-index: 1;
   left: 8px;
   right: 8px;
   padding: 12px 12px 11px;
+  appearance: none;
+  -webkit-appearance: none;
   border-radius: 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(244, 250, 246, 0.98) 100%);
   border: 1px solid rgba(148, 163, 184, 0.14);
+  text-align: left;
   box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
   overflow: hidden;
+  cursor: pointer;
+  pointer-events: auto;
 }
 
 .calendar-task-block h4,
@@ -976,4 +1003,8 @@
   color: #7b8798;
   font-size: 0.75rem;
   font-weight: 600;
+}
+
+.weekly-calendar__modal {
+  width: min(100%, 680px);
 }

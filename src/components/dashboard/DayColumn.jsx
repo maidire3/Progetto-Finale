@@ -1,7 +1,7 @@
 import React from 'react';
 import TaskBlock from './TaskBlock';
 
-function DayColumn({ day, hours, calendarStartHour }) {
+function DayColumn({ day, hours, calendarStartHour, onSlotClick, onTaskClick }) {
   return (
     <div
       className={`weekly-calendar__day-column ${
@@ -21,7 +21,13 @@ function DayColumn({ day, hours, calendarStartHour }) {
 
       <div className="weekly-calendar__day-body">
         {hours.map((hour) => (
-          <div className="weekly-calendar__hour-row" key={`${day.key}-${hour}`} />
+          <button
+            aria-label={`Nuova task per ${day.label} alle ${String(hour).padStart(2, '0')}:00`}
+            className="weekly-calendar__hour-row"
+            key={`${day.key}-${hour}`}
+            type="button"
+            onClick={() => onSlotClick(day.dateValue, hour)}
+          />
         ))}
 
         <div className="weekly-calendar__task-layer">
@@ -29,6 +35,7 @@ function DayColumn({ day, hours, calendarStartHour }) {
             <TaskBlock
               calendarStartHour={calendarStartHour}
               key={task.id}
+              onClick={onTaskClick}
               task={task}
             />
           ))}

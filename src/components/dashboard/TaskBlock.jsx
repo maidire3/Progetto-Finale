@@ -1,13 +1,15 @@
 import React from 'react';
 const HOUR_HEIGHT = 64;
 
-function TaskBlock({ task, calendarStartHour }) {
+function TaskBlock({ task, calendarStartHour, onClick }) {
   const top = (task.startHour - calendarStartHour) * HOUR_HEIGHT + 8;
   const height = Math.max((task.endHour - task.startHour) * HOUR_HEIGHT - 12, 44);
 
   return (
-    <article
+    <button
       className="calendar-task-block"
+      type="button"
+      onClick={() => onClick(task)}
       style={{
         top: `${top}px`,
         height: `${height}px`,
@@ -23,7 +25,7 @@ function TaskBlock({ task, calendarStartHour }) {
           task.endHour
         ).padStart(2, '0')}:00`}
       </p>
-    </article>
+    </button>
   );
 }
 

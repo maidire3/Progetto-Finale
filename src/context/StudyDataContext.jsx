@@ -29,6 +29,7 @@ function normalizeTask(task, fallbackId) {
     title: task.title.trim(),
     status: task.status || 'Da fare',
     subject: task.subject,
+    notes: task.notes?.trim() || '',
     dueDate: normalizedDate,
     dayOffset: Number.isFinite(task.dayOffset) ? task.dayOffset : 0,
     startHour: normalizedDate ? normalizedStartHour : null,
