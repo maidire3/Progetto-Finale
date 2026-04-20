@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
+import TaskModal from '../components/dashboard/TaskModal';
 import DashboardSectionLayout from '../components/layout/DashboardSectionLayout';
-import { TASK_STATUS_OPTIONS, TASK_SUBJECT_OPTIONS } from '../data/studyData';
+import { INITIAL_SUBJECTS } from '../data/studyData';
 import { useStudyData } from '../context/StudyDataContext';
 import '../styles/dashboard.css';
 import '../styles/sidebar.css';
@@ -13,7 +14,9 @@ const EMPTY_TASK_FORM = {
   status: 'Da fare',
   subject: 'Analisi 2',
   dueDate: '',
-  startTime: ''
+  startTime: '',
+  endTime: '',
+  notes: ''
 };
 
 function TasksPage() {
@@ -37,10 +40,17 @@ function TasksPage() {
     setEditingTaskId(task.id);
     setFormValues({
       ...task,
+      status: task.status || 'Da fare',
       dueDate: task.dueDate || '',
       startTime: Number.isFinite(task.startHour)
         ? `${String(task.startHour).padStart(2, '0')}:00`
-        : ''
+        : '',
+      endTime: Number.isFinite(task.endHour)
+        ? task.endHour >= 24
+          ? '23:59'
+          : `${String(task.endHour).padStart(2, '0')}:00`
+        : '',
+      notes: task.notes || ''
     });
     setIsModalOpen(true);
   }
@@ -73,14 +83,18 @@ function TasksPage() {
       title: trimmedTitle,
       status: formValues.status,
       subject: formValues.subject,
+      notes: formValues.notes,
       dueDate: formValues.dueDate,
       startHour:
-        formValues.dueDate && formValues.startTime
+        formValues.dueDate && formValues.startTime && formValues.endTime
           ? Number(formValues.startTime.split(':')[0])
           : null,
       endHour:
-        formValues.dueDate && formValues.startTime
-          ? Math.min(Number(formValues.startTime.split(':')[0]) + 1, 24)
+        formValues.dueDate && formValues.startTime && formValues.endTime
+          ? Math.max(
+              Number(formValues.endTime.split(':')[0]),
+              Number(formValues.startTime.split(':')[0]) + 1
+            )
           : null
     };
 
@@ -170,107 +184,15 @@ function TasksPage() {
         </div>
       </section>
 
-      {isModalOpen ? (
-        <div className="entity-modal-backdrop" role="presentation">
-          <div className="entity-modal" role="dialog" aria-modal="true">
-            <div className="entity-modal__header">
-              <div>
-                <p className="section-card__label">
-                  {editingTask ? 'Modifica task' : 'Nuovo task'}
-                </p>
-                <h3>{editingTask ? 'Aggiorna task' : 'Crea un nuovo task'}</h3>
-              </div>
-
-              <button className="entity-modal__close" type="button" onClick={closeModal}>
-                Chiudi
-              </button>
-            </div>
-
-            <form className="entity-form" onSubmit={handleSubmit}>
-              <div className="entity-form__group">
-                <label htmlFor="task-title">Titolo</label>
-                <input
-                  id="task-title"
-                  name="title"
-                  type="text"
-                  value={formValues.title}
-                  onChange={handleFieldChange}
-                  required
-                />
-              </div>
-
-              <div className="entity-form__row">
-                <div className="entity-form__group">
-                  <label htmlFor="task-subject">Materia</label>
-                  <select
-                    id="task-subject"
-                    name="subject"
-                    value={formValues.subject}
-                    onChange={handleFieldChange}
-                  >
-                    {TASK_SUBJECT_OPTIONS.map((subject) => (
-                      <option key={subject} value={subject}>
-                        {subject}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="entity-form__group">
-                  <label htmlFor="task-status">Stato</label>
-                  <select
-                    id="task-status"
-                    name="status"
-                    value={formValues.status}
-                    onChange={handleFieldChange}
-                  >
-                    {TASK_STATUS_OPTIONS.map((status) => (
-                      <option key={status} value={status}>
-                        {status}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="entity-form__group">
-                <label htmlFor="task-date">Scadenza</label>
-                <input
-                  id="task-date"
-                  name="dueDate"
-                  type="date"
-                  value={formValues.dueDate}
-                  onChange={handleFieldChange}
-                />
-              </div>
-
-              <div className="entity-form__group">
-                <label htmlFor="task-time">Orario calendario facoltativo</label>
-                <input
-                  id="task-time"
-                  name="startTime"
-                  type="time"
-                  value={formValues.startTime}
-                  onChange={handleFieldChange}
-                />
-              </div>
-
-              <div className="entity-form__actions">
-                <button
-                  className="entity-form__button entity-form__button--secondary"
-                  type="button"
-                  onClick={closeModal}
-                >
-                  Annulla
-                </button>
-                <button className="entity-form__button" type="submit">
-                  {editingTask ? 'Salva modifiche' : 'Aggiungi task'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      ) : null}
+      <TaskModal
+        editingTask={editingTask}
+        formValues={formValues}
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onFieldChange={handleFieldChange}
+        onSubmit={handleSubmit}
+        subjectOptions={INITIAL_SUBJECTS}
+      />
     </DashboardSectionLayout>
   );
 }

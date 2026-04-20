@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import DayColumn from './DayColumn';
+import TaskModal from './TaskModal';
 import TimeColumn from './TimeColumn';
 import { useStudyData } from '../../context/StudyDataContext';
 import { getSubjectStyle, INITIAL_SUBJECTS, INITIAL_TASKS } from '../../data/studyData';
@@ -159,6 +160,7 @@ function WeeklyCalendar({
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [formValues, setFormValues] = useState({
     title: '',
+    status: 'Da fare',
     subject: subjects[0]?.name || '',
     dueDate: '',
     startTime: '',
@@ -195,6 +197,7 @@ function WeeklyCalendar({
     setEditingTaskId(null);
     setFormValues({
       title: '',
+      status: 'Da fare',
       subject: subjectOptions[0]?.name || '',
       dueDate: dateValue,
       startTime: formatTimeValue(hour),
@@ -208,6 +211,7 @@ function WeeklyCalendar({
     setEditingTaskId(task.id);
     setFormValues({
       title: task.title,
+      status: task.status || 'Da fare',
       subject: task.subject,
       dueDate: task.dueDate || '',
       startTime: Number.isFinite(task.startHour) ? formatTimeValue(task.startHour) : '',
@@ -226,6 +230,7 @@ function WeeklyCalendar({
     setIsModalOpen(false);
     setFormValues({
       title: '',
+      status: 'Da fare',
       subject: subjectOptions[0]?.name || '',
       dueDate: '',
       startTime: '',
@@ -280,6 +285,7 @@ function WeeklyCalendar({
       : null;
     const payload = {
       title: trimmedTitle,
+      status: formValues.status,
       subject: formValues.subject,
       notes: formValues.notes,
       dueDate: formValues.dueDate,
@@ -292,7 +298,6 @@ function WeeklyCalendar({
     } else {
       addTask({
         ...payload,
-        status: 'Da fare',
         dayOffset: 0
       });
     }
@@ -339,125 +344,15 @@ function WeeklyCalendar({
         </div>
       </section>
 
-      {isModalOpen ? (
-        <div
-          className="entity-modal-backdrop"
-          role="presentation"
-          onClick={closeModal}
-        >
-          <div
-            className="entity-modal weekly-calendar__modal"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Nuova task"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="entity-modal__header">
-              <div>
-                <p className="section-card__label">
-                  {editingTaskId ? 'Modifica task' : 'Nuova task'}
-                </p>
-                <h3>{editingTaskId ? 'Aggiorna task del planner' : 'Aggiungi task al planner'}</h3>
-              </div>
-
-              <button className="entity-modal__close" type="button" onClick={closeModal}>
-                Chiudi
-              </button>
-            </div>
-
-            <form className="entity-form" onSubmit={handleSubmit}>
-              <div className="entity-form__group">
-                <label htmlFor="calendar-task-title">Titolo task</label>
-                <input
-                  id="calendar-task-title"
-                  name="title"
-                  type="text"
-                  value={formValues.title}
-                  onChange={handleFieldChange}
-                  required
-                />
-              </div>
-
-              <div className="entity-form__group">
-                <label htmlFor="calendar-task-subject">Materia</label>
-                <select
-                  id="calendar-task-subject"
-                  name="subject"
-                  value={formValues.subject}
-                  onChange={handleFieldChange}
-                >
-                  {subjectOptions.map((subject) => (
-                    <option key={subject.id || subject.name} value={subject.name}>
-                      {subject.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="entity-form__row">
-                <div className="entity-form__group">
-                  <label htmlFor="calendar-task-date">Data</label>
-                  <input
-                    id="calendar-task-date"
-                    name="dueDate"
-                    type="date"
-                    value={formValues.dueDate}
-                    onChange={handleFieldChange}
-                  />
-                </div>
-
-                <div className="entity-form__group">
-                  <label htmlFor="calendar-task-start-time">Ora inizio</label>
-                  <input
-                    id="calendar-task-start-time"
-                    name="startTime"
-                    type="time"
-                    value={formValues.startTime}
-                    onChange={handleFieldChange}
-                  />
-                </div>
-              </div>
-
-              <div className="entity-form__row">
-                <div className="entity-form__group">
-                  <label htmlFor="calendar-task-end-time">Ora fine</label>
-                  <input
-                    id="calendar-task-end-time"
-                    name="endTime"
-                    type="time"
-                    value={formValues.endTime}
-                    onChange={handleFieldChange}
-                  />
-                </div>
-
-                <div className="entity-form__group">
-                  <label htmlFor="calendar-task-notes">Note</label>
-                  <textarea
-                    id="calendar-task-notes"
-                    name="notes"
-                    placeholder="Appunti rapidi facoltativi"
-                    value={formValues.notes}
-                    onChange={handleFieldChange}
-                  />
-                </div>
-              </div>
-
-              <div className="entity-form__actions">
-                <button
-                  className="entity-form__button entity-form__button--secondary"
-                  type="button"
-                  onClick={closeModal}
-                >
-                  Annulla
-                </button>
-                <button className="entity-form__button" type="submit">
-                  {editingTaskId ? 'Salva modifiche' : 'Aggiungi task'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      ) : null}
+      <TaskModal
+        editingTask={editingTaskId}
+        formValues={formValues}
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onFieldChange={handleFieldChange}
+        onSubmit={handleSubmit}
+        subjectOptions={subjectOptions}
+      />
     </>
   );
 }
