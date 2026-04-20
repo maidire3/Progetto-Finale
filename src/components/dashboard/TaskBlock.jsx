@@ -1,10 +1,8 @@
 import React from 'react';
-
-const START_HOUR = 6;
 const HOUR_HEIGHT = 64;
 
-function TaskBlock({ task }) {
-  const top = (task.startHour - START_HOUR) * HOUR_HEIGHT + 8;
+function TaskBlock({ task, calendarStartHour }) {
+  const top = (task.startHour - calendarStartHour) * HOUR_HEIGHT + 8;
   const height = Math.max((task.endHour - task.startHour) * HOUR_HEIGHT - 12, 44);
 
   return (

@@ -44,9 +44,9 @@ function UserBadge({ user }) {
           <span className="user-badge__role">Studente</span>
         </span>
 
-        <span className="user-badge__chevron" aria-hidden="true">
+{/*         <span className="user-badge__chevron" aria-hidden="true">
           v
-        </span>
+        </span> */}
       </button>
 
       {isMenuOpen ? (

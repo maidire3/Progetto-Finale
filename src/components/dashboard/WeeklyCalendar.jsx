@@ -1,11 +1,8 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import DayColumn from './DayColumn';
 import TimeColumn from './TimeColumn';
+import { useStudyData } from '../../context/StudyDataContext';
 import { getSubjectStyle, INITIAL_SUBJECTS, INITIAL_TASKS } from '../../data/studyData';
-
-const HOURS = [
-  6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24
-];
 const DAY_FORMATTER = new Intl.DateTimeFormat('it-IT', { weekday: 'short' });
 const RANGE_FORMATTER = new Intl.DateTimeFormat('it-IT', {
   day: '2-digit',
@@ -34,10 +31,40 @@ function isSameDay(firstDate, secondDate) {
   );
 }
 
-function createWeekDays(weekOffset, tasks, subjects) {
+function parseHourValue(value, fallbackHour) {
+  const hour = Number(value?.split(':')[0]);
+
+  if (!Number.isFinite(hour)) {
+    return fallbackHour;
+  }
+
+  return hour;
+}
+
+function createHours(startHour, endHour) {
+  const hours = [];
+
+  for (let hour = startHour; hour <= endHour; hour += 1) {
+    hours.push(hour);
+  }
+
+  return hours;
+}
+
+function getWeekStartDate(referenceDate, weekStart) {
+  const startDate = new Date(referenceDate);
+  const currentDay = startDate.getDay();
+  const firstDayIndex = weekStart === 'Domenica' ? 0 : 1;
+  const offset = (currentDay - firstDayIndex + 7) % 7;
+
+  startDate.setDate(startDate.getDate() - offset);
+  return startDate;
+}
+
+function createWeekDays(weekOffset, tasks, subjects, weekStart, plannerStartHour, plannerEndHour) {
   const today = new Date();
-  const startDate = new Date(today);
-  startDate.setDate(today.getDate() - 1 + weekOffset * 7);
+  const startDate = getWeekStartDate(today, weekStart);
+  startDate.setDate(startDate.getDate() + weekOffset * 7);
 
   return Array.from({ length: 7 }, (_, index) => {
     const currentDate = new Date(startDate);
@@ -48,8 +75,12 @@ function createWeekDays(weekOffset, tasks, subjects) {
         const taskDate = parseDateString(task.dueDate);
         const hasCalendarTime =
           Number.isFinite(task.startHour) && Number.isFinite(task.endHour);
+        const isWithinPlannerRange =
+          hasCalendarTime &&
+          task.startHour >= plannerStartHour &&
+          task.endHour <= plannerEndHour;
 
-        return taskDate && hasCalendarTime && task.status !== 'Completato'
+        return taskDate && isWithinPlannerRange && task.status !== 'Completato'
           ? isSameDay(taskDate, currentDate)
           : false;
       })
@@ -82,8 +113,31 @@ function WeeklyCalendar({
   tasks = INITIAL_TASKS,
   subjects = INITIAL_SUBJECTS
 }) {
+  const { settings } = useStudyData();
   const [weekOffset, setWeekOffset] = useState(0);
-  const days = createWeekDays(weekOffset, tasks, subjects);
+  const plannerStartHour = useMemo(
+    () => parseHourValue(settings.plannerStartHour, 6),
+    [settings.plannerStartHour]
+  );
+  const plannerEndHour = useMemo(
+    () => {
+      const parsedEndHour = parseHourValue(settings.plannerEndHour, 22);
+      return parsedEndHour > plannerStartHour ? parsedEndHour : plannerStartHour + 1;
+    },
+    [plannerStartHour, settings.plannerEndHour]
+  );
+  const hours = useMemo(
+    () => createHours(plannerStartHour, plannerEndHour),
+    [plannerEndHour, plannerStartHour]
+  );
+  const days = createWeekDays(
+    weekOffset,
+    tasks,
+    subjects,
+    settings.weekStart,
+    plannerStartHour,
+    plannerEndHour
+  );
   const weekLabel = getWeekLabel(days);
 
   function handlePreviousWeek() {
@@ -121,10 +175,15 @@ function WeeklyCalendar({
       </div>
 
       <div className="weekly-calendar__grid">
-        <TimeColumn hours={HOURS} />
+        <TimeColumn hours={hours} />
 
         {days.map((day) => (
-          <DayColumn day={day} hours={HOURS} key={day.key} />
+          <DayColumn
+            calendarStartHour={plannerStartHour}
+            day={day}
+            hours={hours}
+            key={day.key}
+          />
         ))}
       </div>
     </section>

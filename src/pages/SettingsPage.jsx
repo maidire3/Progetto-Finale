@@ -1,30 +1,24 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import DashboardSectionLayout from '../components/layout/DashboardSectionLayout';
+import { useStudyData } from '../context/StudyDataContext';
 import '../styles/dashboard.css';
 import '../styles/sidebar.css';
 import '../styles/topbar.css';
 import '../styles/task-panel.css';
 
-const INITIAL_SETTINGS = {
-  firstName: 'Davide',
-  lastName: 'Rossi',
-  university: 'Universita di Bologna',
-  degreeCourse: 'Informatica',
-  language: 'Italiano',
-  theme: 'Chiaro',
-  weekStart: 'Lunedi',
-  plannerStartHour: '06:00',
-  plannerEndHour: '22:00'
-};
-
 function SettingsPage() {
-  const [settings, setSettings] = useState(INITIAL_SETTINGS);
+  const { settings, updateSettings } = useStudyData();
+  const [draftSettings, setDraftSettings] = useState(settings);
   const [saveMessage, setSaveMessage] = useState('');
+
+  useEffect(() => {
+    setDraftSettings(settings);
+  }, [settings]);
 
   function handleFieldChange(event) {
     const { name, value } = event.target;
 
-    setSettings((currentSettings) => ({
+    setDraftSettings((currentSettings) => ({
       ...currentSettings,
       [name]: value
     }));
@@ -33,6 +27,7 @@ function SettingsPage() {
 
   function handleSave(event) {
     event.preventDefault();
+    updateSettings(draftSettings);
     setSaveMessage('Modifiche salvate localmente.');
   }
 
@@ -75,7 +70,7 @@ function SettingsPage() {
                 <input
                   name="firstName"
                   type="text"
-                  value={settings.firstName}
+                  value={draftSettings.firstName}
                   onChange={handleFieldChange}
                 />
               </label>
@@ -85,7 +80,7 @@ function SettingsPage() {
                 <input
                   name="lastName"
                   type="text"
-                  value={settings.lastName}
+                  value={draftSettings.lastName}
                   onChange={handleFieldChange}
                 />
               </label>
@@ -95,7 +90,7 @@ function SettingsPage() {
                 <input
                   name="university"
                   type="text"
-                  value={settings.university}
+                  value={draftSettings.university}
                   onChange={handleFieldChange}
                 />
               </label>
@@ -105,7 +100,7 @@ function SettingsPage() {
                 <input
                   name="degreeCourse"
                   type="text"
-                  value={settings.degreeCourse}
+                  value={draftSettings.degreeCourse}
                   onChange={handleFieldChange}
                 />
               </label>
@@ -128,7 +123,7 @@ function SettingsPage() {
                 <span>Lingua</span>
                 <select
                   name="language"
-                  value={settings.language}
+                  value={draftSettings.language}
                   onChange={handleFieldChange}
                 >
                   <option value="Italiano">Italiano</option>
@@ -140,7 +135,7 @@ function SettingsPage() {
                 <span>Tema</span>
                 <select
                   name="theme"
-                  value={settings.theme}
+                  value={draftSettings.theme}
                   onChange={handleFieldChange}
                 >
                   <option value="Chiaro">Chiaro</option>
@@ -153,7 +148,7 @@ function SettingsPage() {
                 <span>Primo giorno della settimana</span>
                 <select
                   name="weekStart"
-                  value={settings.weekStart}
+                  value={draftSettings.weekStart}
                   onChange={handleFieldChange}
                 >
                   <option value="Lunedi">Lunedi</option>
@@ -180,7 +175,7 @@ function SettingsPage() {
                 <input
                   name="plannerStartHour"
                   type="time"
-                  value={settings.plannerStartHour}
+                  value={draftSettings.plannerStartHour}
                   onChange={handleFieldChange}
                 />
               </label>
@@ -190,7 +185,7 @@ function SettingsPage() {
                 <input
                   name="plannerEndHour"
                   type="time"
-                  value={settings.plannerEndHour}
+                  value={draftSettings.plannerEndHour}
                   onChange={handleFieldChange}
                 />
               </label>

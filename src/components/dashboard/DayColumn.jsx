@@ -1,7 +1,7 @@
 import React from 'react';
 import TaskBlock from './TaskBlock';
 
-function DayColumn({ day, hours }) {
+function DayColumn({ day, hours, calendarStartHour }) {
   return (
     <div
       className={`weekly-calendar__day-column ${
@@ -26,7 +26,11 @@ function DayColumn({ day, hours }) {
 
         <div className="weekly-calendar__task-layer">
           {day.tasks.map((task) => (
-            <TaskBlock key={task.id} task={task} />
+            <TaskBlock
+              calendarStartHour={calendarStartHour}
+              key={task.id}
+              task={task}
+            />
           ))}
         </div>
       </div>
