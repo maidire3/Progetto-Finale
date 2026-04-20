@@ -2,8 +2,8 @@ import React, { useMemo, useState } from 'react';
 import { TASK_SUBJECT_OPTIONS } from '../../data/studyData';
 import { useStudyData } from '../../context/StudyDataContext';
 
-function TaskPanel({ isOpen, onOpen, onClose, items = [] }) {
-  const { addTask, tasks } = useStudyData();
+function TaskPanel({ isOpen, onOpen, onClose }) {
+  const { addTask, deleteTask, tasks, updateTask } = useStudyData();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [formValues, setFormValues] = useState({
     title: '',
@@ -16,6 +16,26 @@ function TaskPanel({ isOpen, onOpen, onClose, items = [] }) {
     () => tasks.filter((task) => task.status !== 'Completato'),
     [tasks]
   );
+  const panelTasks = useMemo(() => {
+    const sortedTasks = [...tasks].sort((firstTask, secondTask) => {
+      if (firstTask.status === secondTask.status) {
+        return firstTask.title.localeCompare(secondTask.title, 'it');
+      }
+
+      return firstTask.status === 'Completato' ? 1 : -1;
+    });
+
+    return sortedTasks.map((task) => ({
+      ...task,
+      meta: task.dueDate
+        ? `${task.subject} - ${task.dueDate}${
+            Number.isFinite(task.startHour)
+              ? ` alle ${String(task.startHour).padStart(2, '0')}:00`
+              : ''
+          }`
+        : `${task.subject} - Da pianificare`
+    }));
+  }, [tasks]);
 
   function toggleForm() {
     setIsFormVisible((currentValue) => !currentValue);
@@ -63,14 +83,28 @@ function TaskPanel({ isOpen, onOpen, onClose, items = [] }) {
     setIsFormVisible(false);
   }
 
-  const visibleItems =
-    items.length > 0
-      ? items
-      : openTasks.map((task) => ({
-          id: task.id,
-          title: task.title,
-          meta: `${task.subject} - ${task.dueDate}`
-        }));
+  function handleToggleComplete(task) {
+    if (task.status === 'Completato') {
+      updateTask(task.id, { status: 'Da fare' });
+      return;
+    }
+
+    updateTask(task.id, { status: 'Completato' });
+  }
+
+  function handleDeleteTask(taskId) {
+    const taskToDelete = tasks.find((task) => task.id === taskId);
+
+    if (!taskToDelete) {
+      return;
+    }
+
+    if (!window.confirm(`Vuoi eliminare il task "${taskToDelete.title}"?`)) {
+      return;
+    }
+
+    deleteTask(taskId);
+  }
 
   return (
     <>
@@ -182,12 +216,38 @@ function TaskPanel({ isOpen, onOpen, onClose, items = [] }) {
         ) : null}
 
         <ul className="task-sidebar__list">
-          {visibleItems.map((task) => (
-            <li className="task-sidebar__item" key={task.id}>
+          {panelTasks.map((task) => (
+            <li
+              className={`task-sidebar__item ${
+                task.status === 'Completato' ? 'task-sidebar__item--completed' : ''
+              }`}
+              key={task.id}
+            >
               <span className="task-sidebar__dot" aria-hidden="true" />
-              <div>
+              <div className="task-sidebar__item-content">
                 <p className="task-sidebar__item-title">{task.title}</p>
                 <p className="task-sidebar__item-meta">{task.meta}</p>
+              </div>
+
+              <div className="task-sidebar__item-actions">
+                <button
+                  className={`task-sidebar__action-button ${
+                    task.status === 'Completato'
+                      ? 'task-sidebar__action-button--secondary'
+                      : 'task-sidebar__action-button--success'
+                  }`}
+                  type="button"
+                  onClick={() => handleToggleComplete(task)}
+                >
+                  {task.status === 'Completato' ? 'Ripristina' : 'Completa'}
+                </button>
+                <button
+                  className="task-sidebar__action-button task-sidebar__action-button--danger"
+                  type="button"
+                  onClick={() => handleDeleteTask(task.id)}
+                >
+                  Elimina
+                </button>
               </div>
             </li>
           ))}

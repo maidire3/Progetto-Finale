@@ -1,11 +1,16 @@
 import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
+import sidebarLogo from '../../assets/Logo.png';
 
 function Sidebar({ sections }) {
   return (
     <aside className="sidebar">
       <Link className="sidebar__brand" to="/dashboard">
-        <span className="sidebar__brand-mark">S</span>
+        <img
+          className="sidebar__brand-mark"
+          src={sidebarLogo}
+          alt="Study Tracker logo"
+        />
         <div>
           <p className="sidebar__brand-name">Study Tracker</p>
           <p className="sidebar__brand-caption">Desktop dashboard</p>

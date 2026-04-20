@@ -49,7 +49,9 @@ function createWeekDays(weekOffset, tasks, subjects) {
         const hasCalendarTime =
           Number.isFinite(task.startHour) && Number.isFinite(task.endHour);
 
-        return taskDate && hasCalendarTime ? isSameDay(taskDate, currentDate) : false;
+        return taskDate && hasCalendarTime && task.status !== 'Completato'
+          ? isSameDay(taskDate, currentDate)
+          : false;
       })
       .sort((firstTask, secondTask) => firstTask.startHour - secondTask.startHour)
       .map((task) => ({

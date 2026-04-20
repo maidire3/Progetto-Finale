@@ -17,15 +17,12 @@
 }
 
 .sidebar__brand-mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
   width: 42px;
   height: 42px;
   border-radius: 14px;
-  background: #dff2e3;
-  color: #1f6f43;
-  font-weight: 700;
+  object-fit: cover;
+  box-shadow: 0 8px 18px rgba(31, 111, 67, 0.12);
 }
 
 .sidebar__brand-name,

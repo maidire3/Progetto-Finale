@@ -21,24 +21,8 @@ function DashboardPage() {
       )[0],
     [exams]
   );
-  const taskPanelItems = openTasks.map((task) => ({
-    id: task.id,
-    title: task.title,
-    meta: task.dueDate
-      ? `${task.subject} - ${task.dueDate}${
-          Number.isFinite(task.startHour)
-            ? ` alle ${String(task.startHour).padStart(2, '0')}:00`
-            : ''
-        }`
-      : `${task.subject} - Da pianificare`
-  }));
-
   return (
-    <DashboardSectionLayout
-      title="Dashboard"
-      eyebrow="Study Tracker"
-      taskPanelItems={taskPanelItems}
-    >
+    <DashboardSectionLayout title="Dashboard" eyebrow="Study Tracker">
       <section className="dashboard-placeholder">
         <div className="dashboard-placeholder__intro">
           <p className="dashboard-placeholder__eyebrow">Weekly planner</p>

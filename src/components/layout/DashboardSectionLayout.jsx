@@ -10,7 +10,6 @@ const user = {
 function DashboardSectionLayout({
   title,
   eyebrow = 'Study Tracker',
-  taskPanelItems = [],
   children
 }) {
   const [isTaskPanelOpen, setIsTaskPanelOpen] = useState(false);
@@ -32,7 +31,6 @@ function DashboardSectionLayout({
       isTaskPanelOpen={isTaskPanelOpen}
       onOpenTaskPanel={handleOpenTaskPanel}
       onCloseTaskPanel={handleCloseTaskPanel}
-      taskPanelItems={taskPanelItems}
     >
       {children}
     </AppShell>
