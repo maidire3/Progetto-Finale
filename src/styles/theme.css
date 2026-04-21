@@ -382,6 +382,14 @@ body[data-theme='dark'] .search-result-card__meta {
   color: #94a3b8;
 }
 
+body[data-theme='dark'] .search-page__empty {
+  background: rgb(167 162 201 / 72%);
+}
+
+body[data-theme='dark'] .search-page__empty p {
+  color: #000000;
+}
+
 body[data-theme='dark'] .section-card--clickable:hover,
 body[data-theme='dark'] .note-detail-card {
   border-color: rgba(71, 85, 105, 0.34);
