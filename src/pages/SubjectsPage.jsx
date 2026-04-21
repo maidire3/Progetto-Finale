@@ -16,7 +16,7 @@ import '../styles/task-panel.css';
 const EMPTY_FORM = {
   id: '',
   name: '',
-  color: 'sage',
+  color: 'green',
   scheduleEnabled: false,
   scheduleDays: [],
   startTime: '09:00',
@@ -257,7 +257,14 @@ function SubjectsPage() {
                   {tasks.filter((task) => task.subject === subject.name).length} task attive
                 </span>
                 <span className="subject-card__pill subject-card__pill--secondary">
-                  {COLOR_OPTIONS.find((option) => option.value === subject.color)?.label}
+                  <span
+                    className="subject-card__swatch"
+                    style={{
+                      '--subject-swatch':
+                        COLOR_OPTIONS.find((option) => option.value === subject.color)?.swatch
+                    }}
+                  />
+                  Colore attivo
                 </span>
               </div>
 
@@ -315,19 +322,30 @@ function SubjectsPage() {
               </div>
 
               <div className="subject-form__group">
-                <label htmlFor="subject-color">Colore background</label>
-                <select
-                  id="subject-color"
-                  name="color"
-                  value={formValues.color}
-                  onChange={handleColorChange}
+                <label>Colore background</label>
+                <div
+                  className="subject-color-picker"
+                  role="listbox"
+                  aria-label="Seleziona colore materia"
                 >
                   {COLOR_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
+                    <button
+                      key={option.value}
+                      aria-label={option.label}
+                      aria-selected={formValues.color === option.value}
+                      className={`subject-color-picker__option ${
+                        formValues.color === option.value
+                          ? 'subject-color-picker__option--selected'
+                          : ''
+                      }`}
+                      style={{ '--subject-swatch': option.swatch }}
+                      type="button"
+                      onClick={() => handleColorChange({ target: { value: option.value } })}
+                    >
+                      <span className="subject-color-picker__dot" />
+                    </button>
                   ))}
-                </select>
+                </div>
               </div>
 
               <div className="subject-form__schedule-toggle">

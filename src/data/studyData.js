@@ -1,8 +1,12 @@
 export const COLOR_OPTIONS = [
-  { value: 'sage', label: 'Salvia' },
-  { value: 'sky', label: 'Azzurro' },
-  { value: 'sand', label: 'Sabbia' },
-  { value: 'rose', label: 'Rosa' }
+  { value: 'red', label: 'Rosso', swatch: '#d93025' },
+  { value: 'orange', label: 'Arancione', swatch: '#f97316' },
+  { value: 'amber', label: 'Ambra', swatch: '#fbbf24' },
+  { value: 'green', label: 'Verde', swatch: '#34a853' },
+  { value: 'emerald', label: 'Smeraldo', swatch: '#059669' },
+  { value: 'blue', label: 'Blu', swatch: '#1a73e8' },
+  { value: 'indigo', label: 'Indaco', swatch: '#4f46e5' },
+  { value: 'purple', label: 'Viola', swatch: '#9333ea' }
 ];
 
 export const WEEK_DAYS = [
@@ -16,21 +20,41 @@ export const WEEK_DAYS = [
 ];
 
 export const SUBJECT_COLOR_STYLES = {
-  sage: {
-    accent: '#2f855a',
-    soft: 'rgba(226, 243, 232, 0.92)'
+  red: {
+    accent: '#d93025',
+    soft: 'rgba(253, 236, 234, 0.95)'
   },
-  sky: {
-    accent: '#2b6cb0',
-    soft: 'rgba(230, 240, 250, 0.94)'
+  orange: {
+    accent: '#f97316',
+    soft: 'rgba(255, 237, 213, 0.95)'
   },
-  sand: {
-    accent: '#b7791f',
-    soft: 'rgba(250, 241, 225, 0.94)'
+  amber: {
+    accent: '#d97706',
+    soft: 'rgba(254, 243, 199, 0.95)'
   },
-  rose: {
-    accent: '#b83280',
-    soft: 'rgba(251, 235, 241, 0.94)'
+  green: {
+    accent: '#34a853',
+    soft: 'rgba(230, 244, 234, 0.95)'
+  },
+  emerald: {
+    accent: '#059669',
+    soft: 'rgba(220, 252, 231, 0.95)'
+  },
+  blue: {
+    accent: '#1a73e8',
+    soft: 'rgba(232, 240, 254, 0.96)'
+  },
+  indigo: {
+    accent: '#4f46e5',
+    soft: 'rgba(238, 242, 255, 0.96)'
+  },
+  purple: {
+    accent: '#9333ea',
+    soft: 'rgba(245, 243, 255, 0.96)'
+  },
+  gray: {
+    accent: '#6b7280',
+    soft: 'rgba(243, 244, 246, 0.96)'
   }
 };
 
@@ -39,7 +63,7 @@ export const INITIAL_SUBJECTS = [
     id: 'analisi-2',
     name: 'Analisi 2',
     description: 'Ripasso formule e sessioni esercizi in aula studio.',
-    color: 'sage',
+    color: 'green',
     taskCount: 2,
     scheduleEnabled: true,
     scheduleDays: ['mon', 'wed'],
@@ -50,7 +74,7 @@ export const INITIAL_SUBJECTS = [
     id: 'basi-di-dati',
     name: 'Basi di dati',
     description: 'Laboratorio SQL e progettazione relazionale.',
-    color: 'sky',
+    color: 'blue',
     taskCount: 1,
     scheduleEnabled: true,
     scheduleDays: ['tue'],
@@ -61,7 +85,7 @@ export const INITIAL_SUBJECTS = [
     id: 'statistica',
     name: 'Statistica',
     description: 'Esercizi guidati e simulazioni in vista dell esame.',
-    color: 'sand',
+    color: 'amber',
     taskCount: 1,
     scheduleEnabled: true,
     scheduleDays: ['thu'],
@@ -73,7 +97,8 @@ export const INITIAL_SUBJECTS = [
 export const TASK_STATUS_OPTIONS = ['Da fare', 'In corso', 'Completato'];
 export const GENERAL_SUBJECT_OPTION = {
   id: 'general',
-  name: 'Generale'
+  name: 'Generale',
+  color: 'gray'
 };
 
 export const INITIAL_TASKS = [
@@ -162,8 +187,12 @@ export function formatSubjectSchedule(subject) {
 }
 
 export function getSubjectStyle(subjectName, subjects = INITIAL_SUBJECTS) {
-  const subject = subjects.find((item) => item.name === subjectName);
-  const colorKey = subject?.color || 'sage';
+  if (subjectName === GENERAL_SUBJECT_OPTION.name) {
+    return SUBJECT_COLOR_STYLES.gray;
+  }
 
-  return SUBJECT_COLOR_STYLES[colorKey] || SUBJECT_COLOR_STYLES.sage;
+  const subject = subjects.find((item) => item.name === subjectName);
+  const colorKey = subject?.color || 'green';
+
+  return SUBJECT_COLOR_STYLES[colorKey] || SUBJECT_COLOR_STYLES.green;
 }
