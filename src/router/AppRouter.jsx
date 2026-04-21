@@ -9,6 +9,7 @@ import SubjectsPage from '../pages/SubjectsPage';
 import TasksPage from '../pages/TasksPage';
 import ExamsPage from '../pages/ExamsPage';
 import NotesPage from '../pages/NotesPage';
+import NoteDetailPage from '../pages/NoteDetailPage';
 import SettingsPage from '../pages/SettingsPage';
 
 function AppRouter() {
@@ -24,6 +25,7 @@ function AppRouter() {
         <Route path="/tasks" element={<TasksPage />} />
         <Route path="/exams" element={<ExamsPage />} />
         <Route path="/notes" element={<NotesPage />} />
+        <Route path="/notes/:id" element={<NoteDetailPage />} />
         <Route path="/settings" element={<SettingsPage />} />
       </Routes>
     </BrowserRouter>

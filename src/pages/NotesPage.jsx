@@ -1,115 +1,72 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import deleteIcon from '../assets/icons8-delete-48.png';
 import settingsIcon from '../assets/icons8-settings-50.png';
 import DashboardSectionLayout from '../components/layout/DashboardSectionLayout';
-import { NOTE_FOLDER_OPTIONS } from '../data/studyData';
 import { useStudyData } from '../context/StudyDataContext';
 import '../styles/dashboard.css';
 import '../styles/sidebar.css';
 import '../styles/topbar.css';
 import '../styles/task-panel.css';
 
-const EMPTY_NOTE_FORM = {
-  id: '',
-  title: '',
-  folder: 'Generale',
-  summary: ''
-};
+function formatNoteDate(value) {
+  if (!value) {
+    return 'Data non disponibile';
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return 'Data non disponibile';
+  }
+
+  return new Intl.DateTimeFormat('it-IT', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  }).format(date);
+}
+
+function getPreview(content) {
+  const trimmedContent = (content || '').trim();
+
+  if (!trimmedContent) {
+    return 'Nessun contenuto ancora scritto. Apri l appunto per iniziare.';
+  }
+
+  return trimmedContent;
+}
 
 function NotesPage() {
-  const { addNote, deleteNote, notes, updateNote } = useStudyData();
-  const location = useLocation();
   const navigate = useNavigate();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingNoteId, setEditingNoteId] = useState(null);
-  const [formValues, setFormValues] = useState(EMPTY_NOTE_FORM);
+  const { deleteNote, isNotesLoading, notes } = useStudyData();
 
-  const editingNote = useMemo(
-    () => notes.find((note) => note.id === editingNoteId) || null,
-    [editingNoteId, notes]
-  );
-
-  useEffect(() => {
-    const openResource = location.state?.openResource;
-
-    if (!openResource || openResource.type !== 'note' || openResource.action !== 'edit') {
-      return;
-    }
-
-    const targetNote = notes.find((note) => note.id === openResource.targetId);
-
-    if (!targetNote) {
-      return;
-    }
-
-    openEditModal(targetNote);
-    navigate(location.pathname, { replace: true, state: null });
-  }, [location.pathname, location.state, navigate, notes]);
-
-  function openCreateModal() {
-    setEditingNoteId(null);
-    setFormValues(EMPTY_NOTE_FORM);
-    setIsModalOpen(true);
+  function handleCreateNote() {
+    navigate('/notes/new');
   }
 
-  function openEditModal(note) {
-    setEditingNoteId(note.id);
-    setFormValues(note);
-    setIsModalOpen(true);
+  function handleOpenNote(noteId) {
+    navigate(`/notes/${noteId}`);
   }
 
-  function closeModal() {
-    setEditingNoteId(null);
-    setFormValues(EMPTY_NOTE_FORM);
-    setIsModalOpen(false);
-  }
+  async function handleDeleteNote(event, noteId) {
+    event.stopPropagation();
 
-  function handleFieldChange(event) {
-    const { name, value } = event.target;
-    setFormValues((currentValues) => ({
-      ...currentValues,
-      [name]: value
-    }));
-  }
-
-  function handleSubmit(event) {
-    event.preventDefault();
-
-    const trimmedTitle = formValues.title.trim();
-
-    if (!trimmedTitle) {
-      return;
-    }
-
-    const payload = {
-      id: editingNote ? editingNote.id : `note-${Date.now()}`,
-      title: trimmedTitle,
-      folder: formValues.folder,
-      summary: formValues.summary.trim() || 'Nota rapida creata nella dashboard.'
-    };
-
-    if (editingNote) {
-      updateNote(editingNote.id, payload);
-    } else {
-      addNote(payload);
-    }
-
-    closeModal();
-  }
-
-  function handleDeleteNote(noteId) {
     const noteToDelete = notes.find((note) => note.id === noteId);
 
     if (!noteToDelete) {
       return;
     }
 
-    if (!window.confirm(`Vuoi eliminare la nota "${noteToDelete.title}"?`)) {
+    if (!window.confirm(`Vuoi eliminare l'appunto "${noteToDelete.title}"?`)) {
       return;
     }
 
-    deleteNote(noteId);
+    const result = await deleteNote(noteId);
+
+    if (!result.success) {
+      window.alert(result.message);
+    }
   }
 
   return (
@@ -117,133 +74,89 @@ function NotesPage() {
       <section className="section-page">
         <div className="section-page__header">
           <div className="section-page__intro">
-            <h2>Appunti e cartelle</h2>
+            <h2>I tuoi appunti</h2>
             <p>
-              Organizza note, riassunti e materiali in una struttura leggera ma
-              utile per lo studio quotidiano.
+              Salva note reali collegate alle materie e riaprile in una pagina
+              dedicata comoda da aggiornare.
             </p>
           </div>
 
           <button
             className="section-page__primary-action"
             type="button"
-            onClick={openCreateModal}
+            onClick={handleCreateNote}
           >
             + Nuova nota
           </button>
         </div>
 
-        <div className="section-grid">
-          {notes.map((note) => (
-            <article className="section-card section-card--note" key={note.id}>
-              <p className="section-card__label">Cartella</p>
-              <h3>{note.title}</h3>
-              <p>{note.summary}</p>
-              <p className="section-card__meta">{note.folder}</p>
-              <div className="section-card__actions">
-                <button
-                  className="entity-action-button"
-                  type="button"
-                  onClick={() => openEditModal(note)}
-                  aria-label={`Modifica ${note.title}`}
-                >
-                  <img
-                    alt=""
-                    className="entity-action-button__icon"
-                    src={settingsIcon}
-                  />
-                </button>
-                <button
-                  className="entity-action-button entity-action-button--danger"
-                  type="button"
-                  onClick={() => handleDeleteNote(note.id)}
-                  aria-label={`Elimina ${note.title}`}
-                >
-                  <img
-                    alt=""
-                    className="entity-action-button__icon"
-                    src={deleteIcon}
-                  />
-                </button>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      {isModalOpen ? (
-        <div className="entity-modal-backdrop" role="presentation">
-          <div className="entity-modal" role="dialog" aria-modal="true">
-            <div className="entity-modal__header">
-              <div>
-                <p className="section-card__label">
-                  {editingNote ? 'Modifica nota' : 'Nuova nota'}
-                </p>
-                <h3>{editingNote ? 'Aggiorna nota' : 'Crea una nuova nota'}</h3>
-              </div>
-
-              <button className="entity-modal__close" type="button" onClick={closeModal}>
-                Chiudi
-              </button>
-            </div>
-
-            <form className="entity-form" onSubmit={handleSubmit}>
-              <div className="entity-form__group">
-                <label htmlFor="note-title">Titolo</label>
-                <input
-                  id="note-title"
-                  name="title"
-                  type="text"
-                  value={formValues.title}
-                  onChange={handleFieldChange}
-                  required
-                />
-              </div>
-
-              <div className="entity-form__group">
-                <label htmlFor="note-folder">Cartella</label>
-                <select
-                  id="note-folder"
-                  name="folder"
-                  value={formValues.folder}
-                  onChange={handleFieldChange}
-                >
-                  {NOTE_FOLDER_OPTIONS.map((folder) => (
-                    <option key={folder} value={folder}>
-                      {folder}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="entity-form__group">
-                <label htmlFor="note-summary">Riepilogo</label>
-                <textarea
-                  id="note-summary"
-                  name="summary"
-                  rows="4"
-                  value={formValues.summary}
-                  onChange={handleFieldChange}
-                  placeholder="Breve descrizione della nota o della cartella."
-                />
-              </div>
-
-              <div className="entity-form__actions">
-                <button
-                  className="entity-form__button entity-form__button--secondary"
-                  type="button"
-                  onClick={closeModal}
-                >
-                  Annulla
-                </button>
-                <button className="entity-form__button" type="submit">
-                  {editingNote ? 'Salva modifiche' : 'Aggiungi nota'}
-                </button>
-              </div>
-            </form>
+        {isNotesLoading ? (
+          <div className="section-empty-state">
+            <p>Caricamento appunti in corso...</p>
           </div>
-        </div>
-      ) : null}
+        ) : null}
+
+        {!isNotesLoading && notes.length === 0 ? (
+          <div className="section-empty-state">
+            <p>Nessun appunto ancora creato. Inizia dalla tua prima nota di studio.</p>
+          </div>
+        ) : null}
+
+        {!isNotesLoading && notes.length > 0 ? (
+          <div className="section-grid">
+            {notes.map((note) => (
+              <article
+                className="section-card section-card--note section-card--clickable"
+                key={note.id}
+                role="button"
+                tabIndex={0}
+                onClick={() => handleOpenNote(note.id)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    handleOpenNote(note.id);
+                  }
+                }}
+              >
+                <p className="section-card__label">Appunto</p>
+                <h3>{note.title}</h3>
+                <p className="section-card__meta section-card__meta--subject">{note.subject}</p>
+                <p className="section-card__preview">{getPreview(note.content)}</p>
+                <p className="section-card__meta">Ultima modifica: {formatNoteDate(note.updatedAt)}</p>
+                <div className="section-card__actions">
+                  <button
+                    className="entity-action-button"
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      handleOpenNote(note.id);
+                    }}
+                    aria-label={`Apri ${note.title}`}
+                  >
+                    <img
+                      alt=""
+                      className="entity-action-button__icon"
+                      src={settingsIcon}
+                    />
+                  </button>
+                  <button
+                    className="entity-action-button entity-action-button--danger"
+                    type="button"
+                    onClick={(event) => handleDeleteNote(event, note.id)}
+                    aria-label={`Elimina ${note.title}`}
+                  >
+                    <img
+                      alt=""
+                      className="entity-action-button__icon"
+                      src={deleteIcon}
+                    />
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : null}
+      </section>
     </DashboardSectionLayout>
   );
 }

@@ -9,7 +9,6 @@ import {
   saveAuthSession,
   saveThemePreference
 } from '../utils/auth';
-import { INITIAL_NOTES } from '../data/studyData';
 
 const StudyDataContext = createContext(null);
 
@@ -78,8 +77,10 @@ function normalizeNote(note) {
   return {
     id: note.id,
     title: note.title,
-    folder: note.folder || 'Generale',
-    summary: note.summary || ''
+    subject: note.subject || 'Generale',
+    content: note.content || '',
+    createdAt: note.createdAt || '',
+    updatedAt: note.updatedAt || ''
   };
 }
 
@@ -87,13 +88,14 @@ export function StudyDataProvider({ children }) {
   const [subjects, setSubjects] = useState([]);
   const [exams, setExams] = useState([]);
   const [tasks, setTasks] = useState([]);
-  const [notes, setNotes] = useState(() => INITIAL_NOTES.map(normalizeNote));
+  const [notes, setNotes] = useState([]);
   const [currentUser, setCurrentUser] = useState(getStoredUser);
   const [settings, setSettings] = useState(() => buildSettingsFromUser(getStoredUser()));
   const [isUserLoading, setIsUserLoading] = useState(Boolean(getStoredToken()));
   const [isSubjectsLoading, setIsSubjectsLoading] = useState(Boolean(getStoredToken()));
   const [isTasksLoading, setIsTasksLoading] = useState(Boolean(getStoredToken()));
   const [isExamsLoading, setIsExamsLoading] = useState(Boolean(getStoredToken()));
+  const [isNotesLoading, setIsNotesLoading] = useState(Boolean(getStoredToken()));
 
   async function refreshSubjects() {
     const token = getStoredToken();
@@ -188,6 +190,38 @@ export function StudyDataProvider({ children }) {
       setExams([]);
     } finally {
       setIsExamsLoading(false);
+    }
+  }
+
+  async function refreshNotes() {
+    const token = getStoredToken();
+
+    if (!token) {
+      setNotes([]);
+      setIsNotesLoading(false);
+      return;
+    }
+
+    try {
+      setIsNotesLoading(true);
+
+      const response = await fetch(`${API_BASE_URL}/api/notes`, {
+        headers: {
+          ...getAuthHeaders()
+        }
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Impossibile recuperare gli appunti.');
+      }
+
+      setNotes((data.notes || []).map(normalizeNote));
+    } catch (error) {
+      setNotes([]);
+    } finally {
+      setIsNotesLoading(false);
     }
   }
 
@@ -579,54 +613,196 @@ export function StudyDataProvider({ children }) {
     }
   }
 
-  function addNote(noteData) {
-    const normalizedNote = normalizeNote({
-      id: noteData.id || `note-${Date.now()}`,
-      ...noteData
-    });
+  async function getNote(noteId) {
+    const existingNote = notes.find((note) => note.id === noteId);
 
-    setNotes((currentNotes) => [...currentNotes, normalizedNote]);
+    if (existingNote) {
+      return {
+        success: true,
+        note: existingNote
+      };
+    }
 
-    return {
-      success: true,
-      message: 'Nota creata con successo.',
-      note: normalizedNote
-    };
+    const token = getStoredToken();
+
+    if (!token) {
+      return {
+        success: false,
+        message: 'Nessun utente autenticato.'
+      };
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/notes/${noteId}`, {
+        headers: {
+          ...getAuthHeaders()
+        }
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Impossibile recuperare l appunto.');
+      }
+
+      const normalizedNote = normalizeNote(data.note);
+
+      setNotes((currentNotes) => {
+        if (currentNotes.some((note) => note.id === noteId)) {
+          return currentNotes.map((note) => (note.id === noteId ? normalizedNote : note));
+        }
+
+        return [...currentNotes, normalizedNote];
+      });
+
+      return {
+        success: true,
+        note: normalizedNote
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message || 'Si e verificato un errore durante il recupero.'
+      };
+    }
   }
 
-  function updateNote(noteId, updates) {
+  async function addNote(noteData) {
+    const token = getStoredToken();
+
+    if (!token) {
+      return {
+        success: false,
+        message: 'Nessun utente autenticato.'
+      };
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/notes`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        body: JSON.stringify(noteData)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Creazione appunto non riuscita.');
+      }
+
+      const normalizedNote = normalizeNote(data.note);
+      setNotes((currentNotes) => [normalizedNote, ...currentNotes]);
+
+      return {
+        success: true,
+        message: data.message || 'Appunto creato con successo.',
+        note: normalizedNote
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message || 'Si e verificato un errore durante la creazione.'
+      };
+    }
+  }
+
+  async function updateNote(noteId, updates) {
+    const token = getStoredToken();
+
+    if (!token) {
+      return {
+        success: false,
+        message: 'Nessun utente autenticato.'
+      };
+    }
+
     const existingNote = notes.find((note) => note.id === noteId);
 
     if (!existingNote) {
       return {
         success: false,
-        message: 'Nota non trovata.'
+        message: 'Appunto non trovato.'
       };
     }
 
-    const normalizedNote = normalizeNote({
+    const payload = {
       ...existingNote,
       ...updates
-    });
-
-    setNotes((currentNotes) =>
-      currentNotes.map((note) => (note.id === noteId ? normalizedNote : note))
-    );
-
-    return {
-      success: true,
-      message: 'Nota aggiornata con successo.',
-      note: normalizedNote
     };
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/notes/${noteId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Aggiornamento appunto non riuscito.');
+      }
+
+      const normalizedNote = normalizeNote(data.note);
+      setNotes((currentNotes) =>
+        currentNotes.map((note) => (note.id === noteId ? normalizedNote : note))
+      );
+
+      return {
+        success: true,
+        message: data.message || 'Appunto aggiornato con successo.',
+        note: normalizedNote
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message || 'Si e verificato un errore durante il salvataggio.'
+      };
+    }
   }
 
-  function deleteNote(noteId) {
-    setNotes((currentNotes) => currentNotes.filter((note) => note.id !== noteId));
+  async function deleteNote(noteId) {
+    const token = getStoredToken();
 
-    return {
-      success: true,
-      message: 'Nota eliminata con successo.'
-    };
+    if (!token) {
+      return {
+        success: false,
+        message: 'Nessun utente autenticato.'
+      };
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/notes/${noteId}`, {
+        method: 'DELETE',
+        headers: {
+          ...getAuthHeaders()
+        }
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Eliminazione appunto non riuscita.');
+      }
+
+      setNotes((currentNotes) => currentNotes.filter((note) => note.id !== noteId));
+
+      return {
+        success: true,
+        message: data.message || 'Appunto eliminato con successo.'
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message || 'Si e verificato un errore durante l eliminazione.'
+      };
+    }
   }
 
   async function refreshCurrentUser() {
@@ -637,6 +813,7 @@ export function StudyDataProvider({ children }) {
       setSubjects([]);
       setTasks([]);
       setExams([]);
+      setNotes([]);
       setSettings((currentSettings) => ({
         ...DEFAULT_SETTINGS,
         theme: currentSettings.theme
@@ -666,13 +843,14 @@ export function StudyDataProvider({ children }) {
       });
       setCurrentUser(data.user);
       setSettings(buildSettingsFromUser(data.user));
-      await Promise.all([refreshSubjects(), refreshTasks(), refreshExams()]);
+      await Promise.all([refreshSubjects(), refreshTasks(), refreshExams(), refreshNotes()]);
     } catch (error) {
       clearAuthSession();
       setCurrentUser(null);
       setSubjects([]);
       setTasks([]);
       setExams([]);
+      setNotes([]);
       setSettings((currentSettings) => ({
         ...DEFAULT_SETTINGS,
         theme: currentSettings.theme
@@ -793,6 +971,7 @@ export function StudyDataProvider({ children }) {
       isSubjectsLoading,
       isTasksLoading,
       isExamsLoading,
+      isNotesLoading,
       settings,
       addSubject,
       updateSubject,
@@ -804,18 +983,21 @@ export function StudyDataProvider({ children }) {
       updateExam,
       deleteExam,
       addNote,
+      getNote,
       updateNote,
       deleteNote,
       refreshCurrentUser,
       refreshSubjects,
       refreshTasks,
       refreshExams,
+      refreshNotes,
       updateSettings
     }),
     [
       currentUser,
       exams,
       isExamsLoading,
+      isNotesLoading,
       isSubjectsLoading,
       isTasksLoading,
       isUserLoading,

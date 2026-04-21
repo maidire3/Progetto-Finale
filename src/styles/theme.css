@@ -382,6 +382,29 @@ body[data-theme='dark'] .search-result-card__meta {
   color: #94a3b8;
 }
 
+body[data-theme='dark'] .section-card--clickable:hover,
+body[data-theme='dark'] .note-detail-card {
+  border-color: rgba(71, 85, 105, 0.34);
+}
+
+body[data-theme='dark'] .note-detail-card {
+  background: rgba(15, 23, 42, 0.96);
+}
+
+body[data-theme='dark'] .section-card__preview,
+body[data-theme='dark'] .note-detail-page__updated {
+  color: #94a3b8;
+}
+
+body[data-theme='dark'] .section-card__meta--subject,
+body[data-theme='dark'] .note-detail-page__back {
+  color: #86efac;
+}
+
+body[data-theme='dark'] .note-detail-card__header h2 {
+  color: #f8fafc;
+}
+
 body[data-theme='dark'] .feature-card__icon {
   background: linear-gradient(135deg, #166534, #22c55e);
 }

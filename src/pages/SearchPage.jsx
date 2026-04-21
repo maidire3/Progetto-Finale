@@ -41,7 +41,7 @@ function SearchPage() {
         includesQuery(trimmedQuery, exam.subject, exam.location, exam.date)
       ),
       notes: notes.filter((note) =>
-        includesQuery(trimmedQuery, note.title, note.folder, note.summary)
+        includesQuery(trimmedQuery, note.title, note.subject, note.content)
       )
     };
   }, [exams, notes, subjects, tasks, trimmedQuery]);
@@ -104,17 +104,8 @@ function SearchPage() {
         title: 'Appunti',
         items: results.notes,
         getLabel: (note) => note.title,
-        getMeta: (note) => note.folder,
-        onSelect: (note) =>
-          navigate('/notes', {
-            state: {
-              openResource: {
-                type: 'note',
-                targetId: note.id,
-                action: 'edit'
-              }
-            }
-          })
+        getMeta: (note) => note.subject || 'Generale',
+        onSelect: (note) => navigate(`/notes/${note.id}`)
       }
     ],
     [navigate, results.exams, results.notes, results.subjects, results.tasks]
