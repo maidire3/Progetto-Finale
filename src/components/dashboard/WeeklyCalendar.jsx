@@ -3,7 +3,11 @@ import DayColumn from './DayColumn';
 import TaskModal from './TaskModal';
 import TimeColumn from './TimeColumn';
 import { useStudyData } from '../../context/StudyDataContext';
-import { getSubjectStyle, INITIAL_SUBJECTS, INITIAL_TASKS } from '../../data/studyData';
+import {
+  getSubjectStyle,
+  getTaskSubjectOptions,
+  INITIAL_TASKS
+} from '../../data/studyData';
 const DAY_FORMATTER = new Intl.DateTimeFormat('it-IT', { weekday: 'short' });
 const RANGE_FORMATTER = new Intl.DateTimeFormat('it-IT', {
   day: '2-digit',
@@ -152,7 +156,7 @@ function getWeekLabel(days) {
 
 function WeeklyCalendar({
   tasks = INITIAL_TASKS,
-  subjects = INITIAL_SUBJECTS
+  subjects = []
 }) {
   const { addTask, settings, updateTask } = useStudyData();
   const [weekOffset, setWeekOffset] = useState(0);
@@ -167,6 +171,8 @@ function WeeklyCalendar({
     endTime: '',
     notes: ''
   });
+  const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const plannerStartHour = useMemo(
     () => parseHourValue(settings.plannerStartHour, 6),
     [settings.plannerStartHour]
@@ -191,7 +197,7 @@ function WeeklyCalendar({
     plannerEndHour
   );
   const weekLabel = getWeekLabel(days);
-  const subjectOptions = subjects.length > 0 ? subjects : INITIAL_SUBJECTS;
+  const subjectOptions = getTaskSubjectOptions(subjects);
 
   function openCreateModal(dateValue, hour) {
     setEditingTaskId(null);
@@ -205,6 +211,7 @@ function WeeklyCalendar({
       notes: ''
     });
     setIsModalOpen(true);
+    setFeedbackMessage('');
   }
 
   function openEditModal(task) {
@@ -223,6 +230,7 @@ function WeeklyCalendar({
       notes: task.notes || ''
     });
     setIsModalOpen(true);
+    setFeedbackMessage('');
   }
 
   function closeModal() {
@@ -237,6 +245,7 @@ function WeeklyCalendar({
       endTime: '',
       notes: ''
     });
+    setFeedbackMessage('');
   }
 
   function handlePreviousWeek() {
@@ -260,12 +269,13 @@ function WeeklyCalendar({
     }));
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
 
     const trimmedTitle = formValues.title.trim();
 
     if (!trimmedTitle) {
+      setFeedbackMessage('Il titolo task e obbligatorio.');
       return;
     }
 
@@ -293,13 +303,17 @@ function WeeklyCalendar({
       endHour: normalizedEndHour
     };
 
-    if (editingTaskId) {
-      updateTask(editingTaskId, payload);
-    } else {
-      addTask({
-        ...payload,
-        dayOffset: 0
-      });
+    setIsSubmitting(true);
+
+    const result = editingTaskId
+      ? await updateTask(editingTaskId, payload)
+      : await addTask(payload);
+
+    setIsSubmitting(false);
+
+    if (!result.success) {
+      setFeedbackMessage(result.message);
+      return;
     }
 
     closeModal();
@@ -346,8 +360,10 @@ function WeeklyCalendar({
 
       <TaskModal
         editingTask={editingTaskId}
+        feedbackMessage={feedbackMessage}
         formValues={formValues}
         isOpen={isModalOpen}
+        isSubmitting={isSubmitting}
         onClose={closeModal}
         onFieldChange={handleFieldChange}
         onSubmit={handleSubmit}

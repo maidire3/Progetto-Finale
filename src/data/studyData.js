@@ -71,6 +71,10 @@ export const INITIAL_SUBJECTS = [
 ];
 
 export const TASK_STATUS_OPTIONS = ['Da fare', 'In corso', 'Completato'];
+export const GENERAL_SUBJECT_OPTION = {
+  id: 'general',
+  name: 'Generale'
+};
 
 export const INITIAL_TASKS = [
   {
@@ -121,8 +125,29 @@ export const INITIAL_EXAMS = [
   { id: 'exam-3', subject: 'Basi di dati', date: '2026-06-03', location: 'Aula Magna' }
 ];
 
-export const TASK_SUBJECT_OPTIONS = INITIAL_SUBJECTS.map((subject) => subject.name);
+export const TASK_SUBJECT_OPTIONS = [
+  GENERAL_SUBJECT_OPTION.name,
+  ...INITIAL_SUBJECTS.map((subject) => subject.name)
+];
 export const EXAM_SUBJECT_OPTIONS = INITIAL_SUBJECTS.map((subject) => subject.name);
+
+export function getTaskSubjectOptions(subjects = []) {
+  const normalizedSubjects = subjects.filter(
+    (subject) => subject?.name && subject.name !== GENERAL_SUBJECT_OPTION.name
+  );
+
+  return [GENERAL_SUBJECT_OPTION, ...normalizedSubjects];
+}
+
+export function getExamSubjectOptions(subjects = []) {
+  const normalizedSubjects = subjects.filter((subject) => subject?.name);
+
+  if (normalizedSubjects.length === 0) {
+    return [GENERAL_SUBJECT_OPTION];
+  }
+
+  return normalizedSubjects;
+}
 
 export function formatSubjectSchedule(subject) {
   if (!subject.scheduleEnabled || subject.scheduleDays.length === 0) {

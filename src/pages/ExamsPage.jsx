@@ -2,24 +2,37 @@ import React, { useMemo, useState } from 'react';
 import deleteIcon from '../assets/icons8-delete-48.png';
 import settingsIcon from '../assets/icons8-settings-50.png';
 import DashboardSectionLayout from '../components/layout/DashboardSectionLayout';
-import { EXAM_SUBJECT_OPTIONS, INITIAL_EXAMS } from '../data/studyData';
+import { getExamSubjectOptions } from '../data/studyData';
+import { useStudyData } from '../context/StudyDataContext';
 import '../styles/dashboard.css';
 import '../styles/sidebar.css';
 import '../styles/topbar.css';
 import '../styles/task-panel.css';
 
-const EMPTY_EXAM_FORM = {
-  id: '',
-  subject: 'Analisi 2',
-  date: '2026-05-30',
-  location: ''
-};
+function getEmptyExamForm(subjectOptions) {
+  return {
+    id: '',
+    subject: subjectOptions[0]?.name || 'Generale',
+    date: '',
+    location: ''
+  };
+}
 
 function ExamsPage() {
-  const [exams, setExams] = useState(INITIAL_EXAMS);
+  const {
+    addExam,
+    deleteExam,
+    exams,
+    isExamsLoading,
+    subjects,
+    updateExam
+  } = useStudyData();
+  const subjectOptions = getExamSubjectOptions(subjects);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingExamId, setEditingExamId] = useState(null);
-  const [formValues, setFormValues] = useState(EMPTY_EXAM_FORM);
+  const [formValues, setFormValues] = useState(getEmptyExamForm(subjectOptions));
+  const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const editingExam = useMemo(
     () => exams.find((exam) => exam.id === editingExamId) || null,
@@ -28,19 +41,22 @@ function ExamsPage() {
 
   function openCreateModal() {
     setEditingExamId(null);
-    setFormValues(EMPTY_EXAM_FORM);
+    setFormValues(getEmptyExamForm(subjectOptions));
+    setFeedbackMessage('');
     setIsModalOpen(true);
   }
 
   function openEditModal(exam) {
     setEditingExamId(exam.id);
     setFormValues(exam);
+    setFeedbackMessage('');
     setIsModalOpen(true);
   }
 
   function closeModal() {
     setEditingExamId(null);
-    setFormValues(EMPTY_EXAM_FORM);
+    setFormValues(getEmptyExamForm(subjectOptions));
+    setFeedbackMessage('');
     setIsModalOpen(false);
   }
 
@@ -50,32 +66,40 @@ function ExamsPage() {
       ...currentValues,
       [name]: value
     }));
+    setFeedbackMessage('');
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
 
+    if (!formValues.subject || !formValues.date) {
+      setFeedbackMessage('Materia e data sono obbligatorie.');
+      return;
+    }
+
     const payload = {
-      id: editingExam ? editingExam.id : `exam-${Date.now()}`,
       subject: formValues.subject,
       date: formValues.date,
       location: formValues.location.trim() || 'Da definire'
     };
 
-    if (editingExam) {
-      setExams((currentExams) =>
-        currentExams.map((exam) =>
-          exam.id === editingExam.id ? { ...exam, ...payload } : exam
-        )
-      );
-    } else {
-      setExams((currentExams) => [...currentExams, payload]);
+    setIsSubmitting(true);
+
+    const result = editingExam
+      ? await updateExam(editingExam.id, payload)
+      : await addExam(payload);
+
+    setIsSubmitting(false);
+
+    if (!result.success) {
+      setFeedbackMessage(result.message);
+      return;
     }
 
     closeModal();
   }
 
-  function handleDeleteExam(examId) {
+  async function handleDeleteExam(examId) {
     const examToDelete = exams.find((exam) => exam.id === examId);
 
     if (!examToDelete) {
@@ -86,7 +110,11 @@ function ExamsPage() {
       return;
     }
 
-    setExams((currentExams) => currentExams.filter((exam) => exam.id !== examId));
+    const result = await deleteExam(examId);
+
+    if (!result.success) {
+      window.alert(result.message);
+    }
   }
 
   return (
@@ -110,45 +138,59 @@ function ExamsPage() {
           </button>
         </div>
 
-        <div className="section-list">
-          {exams.map((exam) => (
-            <article className="section-list__item section-list__item--rich" key={exam.id}>
-              <div>
-                <h3>{exam.subject}</h3>
-                <p>{exam.location}</p>
-                <p className="section-list__meta">Data: {exam.date}</p>
-              </div>
+        {isExamsLoading ? (
+          <div className="section-empty-state">
+            <p>Caricamento esami in corso...</p>
+          </div>
+        ) : null}
 
-              <div className="section-list__actions">
-                <span className="section-status section-status--date">{exam.date}</span>
-                <button
-                  className="entity-action-button"
-                  type="button"
-                  onClick={() => openEditModal(exam)}
-                  aria-label={`Modifica esame ${exam.subject}`}
-                >
-                  <img
-                    alt=""
-                    className="entity-action-button__icon"
-                    src={settingsIcon}
-                  />
-                </button>
-                <button
-                  className="entity-action-button entity-action-button--danger"
-                  type="button"
-                  onClick={() => handleDeleteExam(exam.id)}
-                  aria-label={`Elimina esame ${exam.subject}`}
-                >
-                  <img
-                    alt=""
-                    className="entity-action-button__icon"
-                    src={deleteIcon}
-                  />
-                </button>
-              </div>
-            </article>
-          ))}
-        </div>
+        {!isExamsLoading && exams.length === 0 ? (
+          <div className="section-empty-state">
+            <p>Nessun esame ancora creato. Aggiungi il primo appello del semestre.</p>
+          </div>
+        ) : null}
+
+        {!isExamsLoading && exams.length > 0 ? (
+          <div className="section-list">
+            {exams.map((exam) => (
+              <article className="section-list__item section-list__item--rich" key={exam.id}>
+                <div>
+                  <h3>{exam.subject}</h3>
+                  <p>{exam.location}</p>
+                  <p className="section-list__meta">Data: {exam.date}</p>
+                </div>
+
+                <div className="section-list__actions">
+                  <span className="section-status section-status--date">{exam.date}</span>
+                  <button
+                    className="entity-action-button"
+                    type="button"
+                    onClick={() => openEditModal(exam)}
+                    aria-label={`Modifica esame ${exam.subject}`}
+                  >
+                    <img
+                      alt=""
+                      className="entity-action-button__icon"
+                      src={settingsIcon}
+                    />
+                  </button>
+                  <button
+                    className="entity-action-button entity-action-button--danger"
+                    type="button"
+                    onClick={() => handleDeleteExam(exam.id)}
+                    aria-label={`Elimina esame ${exam.subject}`}
+                  >
+                    <img
+                      alt=""
+                      className="entity-action-button__icon"
+                      src={deleteIcon}
+                    />
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : null}
       </section>
 
       {isModalOpen ? (
@@ -176,9 +218,9 @@ function ExamsPage() {
                   value={formValues.subject}
                   onChange={handleFieldChange}
                 >
-                  {EXAM_SUBJECT_OPTIONS.map((subject) => (
-                    <option key={subject} value={subject}>
-                      {subject}
+                  {subjectOptions.map((subject) => (
+                    <option key={subject.id || subject.name} value={subject.name || subject}>
+                      {subject.name || subject}
                     </option>
                   ))}
                 </select>
@@ -209,6 +251,10 @@ function ExamsPage() {
                 </div>
               </div>
 
+              {feedbackMessage ? (
+                <p className="entity-form__message">{feedbackMessage}</p>
+              ) : null}
+
               <div className="entity-form__actions">
                 <button
                   className="entity-form__button entity-form__button--secondary"
@@ -217,8 +263,12 @@ function ExamsPage() {
                 >
                   Annulla
                 </button>
-                <button className="entity-form__button" type="submit">
-                  {editingExam ? 'Salva modifiche' : 'Aggiungi esame'}
+                <button className="entity-form__button" type="submit" disabled={isSubmitting}>
+                  {isSubmitting
+                    ? 'Salvataggio...'
+                    : editingExam
+                      ? 'Salva modifiche'
+                      : 'Aggiungi esame'}
                 </button>
               </div>
             </form>

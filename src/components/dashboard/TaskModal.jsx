@@ -4,7 +4,9 @@ import { TASK_STATUS_OPTIONS } from '../../data/studyData';
 function TaskModal({
   isOpen,
   editingTask,
+  feedbackMessage = '',
   formValues,
+  isSubmitting = false,
   onClose,
   onFieldChange,
   onSubmit,
@@ -138,6 +140,10 @@ function TaskModal({
             </div>
           </div>
 
+          {feedbackMessage ? (
+            <p className="entity-form__message">{feedbackMessage}</p>
+          ) : null}
+
           <div className="entity-form__actions">
             <button
               className="entity-form__button entity-form__button--secondary"
@@ -146,8 +152,12 @@ function TaskModal({
             >
               Annulla
             </button>
-            <button className="entity-form__button" type="submit">
-              {editingTask ? 'Salva modifiche' : 'Aggiungi task'}
+            <button className="entity-form__button" type="submit" disabled={isSubmitting}>
+              {isSubmitting
+                ? 'Salvataggio...'
+                : editingTask
+                  ? 'Salva modifiche'
+                  : 'Aggiungi task'}
             </button>
           </div>
         </form>

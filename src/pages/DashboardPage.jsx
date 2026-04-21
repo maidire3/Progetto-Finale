@@ -15,10 +15,15 @@ function DashboardPage() {
     [tasks]
   );
   const nextExam = useMemo(
-    () =>
-      [...exams].sort(
+    () => {
+      if (exams.length === 0) {
+        return null;
+      }
+
+      return [...exams].sort(
         (firstExam, secondExam) => new Date(firstExam.date) - new Date(secondExam.date)
-      )[0],
+      )[0];
+    },
     [exams]
   );
   return (
@@ -51,8 +56,8 @@ function DashboardPage() {
 
           <article className="dashboard-summary-card">
             <p className="dashboard-summary-card__label">Prossimo esame</p>
-            <h3>{nextExam.subject}</h3>
-            <p>{`${nextExam.date} - ${nextExam.location}`}</p>
+            <h3>{nextExam ? nextExam.subject : 'Nessuno'}</h3>
+            <p>{nextExam ? `${nextExam.date} - ${nextExam.location}` : 'Nessun esame pianificato.'}</p>
           </article>
         </div>
 
@@ -115,15 +120,27 @@ function DashboardPage() {
                   </div>
                 ))}
 
-                <div className="dashboard-linked-item dashboard-linked-item--exam">
-                  <div>
-                    <p className="dashboard-linked-item__title">{nextExam.subject}</p>
-                    <p className="dashboard-linked-item__meta">
-                      {nextExam.date} - {nextExam.location}
-                    </p>
+                {nextExam ? (
+                  <div className="dashboard-linked-item dashboard-linked-item--exam">
+                    <div>
+                      <p className="dashboard-linked-item__title">{nextExam.subject}</p>
+                      <p className="dashboard-linked-item__meta">
+                        {nextExam.date} - {nextExam.location}
+                      </p>
+                    </div>
+                    <span className="dashboard-linked-item__pill">Esame</span>
                   </div>
-                  <span className="dashboard-linked-item__pill">Esame</span>
-                </div>
+                ) : (
+                  <div className="dashboard-linked-item dashboard-linked-item--exam">
+                    <div>
+                      <p className="dashboard-linked-item__title">Nessun esame in programma</p>
+                      <p className="dashboard-linked-item__meta">
+                        Aggiungi un esame per vederlo qui in dashboard.
+                      </p>
+                    </div>
+                    <span className="dashboard-linked-item__pill">Vuoto</span>
+                  </div>
+                )}
               </div>
             </article>
           </div>

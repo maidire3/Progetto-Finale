@@ -1,13 +1,15 @@
 import React, { useMemo, useState } from 'react';
-import { TASK_SUBJECT_OPTIONS } from '../../data/studyData';
+import { getTaskSubjectOptions } from '../../data/studyData';
 import { useStudyData } from '../../context/StudyDataContext';
 
 function TaskPanel({ isOpen, onOpen, onClose }) {
-  const { addTask, deleteTask, tasks, updateTask } = useStudyData();
+  const { addTask, deleteTask, subjects, tasks, updateTask } = useStudyData();
+  const subjectOptions = getTaskSubjectOptions(subjects);
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState('');
   const [formValues, setFormValues] = useState({
     title: '',
-    subject: TASK_SUBJECT_OPTIONS[0],
+    subject: subjectOptions[0]?.name || '',
     dueDate: '',
     startTime: ''
   });
@@ -39,6 +41,7 @@ function TaskPanel({ isOpen, onOpen, onClose }) {
 
   function toggleForm() {
     setIsFormVisible((currentValue) => !currentValue);
+    setFeedbackMessage('');
   }
 
   function handleFieldChange(event) {
@@ -49,16 +52,17 @@ function TaskPanel({ isOpen, onOpen, onClose }) {
     }));
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
 
     const trimmedTitle = formValues.title.trim();
 
-    if (!trimmedTitle) {
+    if (!trimmedTitle || !formValues.subject) {
+      setFeedbackMessage('Titolo e materia sono obbligatori.');
       return;
     }
 
-    addTask({
+    const result = await addTask({
       title: trimmedTitle,
       subject: formValues.subject,
       dueDate: formValues.dueDate,
@@ -74,25 +78,32 @@ function TaskPanel({ isOpen, onOpen, onClose }) {
           : null
     });
 
-    setFormValues({
-      title: '',
-      subject: TASK_SUBJECT_OPTIONS[0],
-      dueDate: '',
-      startTime: ''
-    });
-    setIsFormVisible(false);
-  }
-
-  function handleToggleComplete(task) {
-    if (task.status === 'Completato') {
-      updateTask(task.id, { status: 'Da fare' });
+    if (!result.success) {
+      setFeedbackMessage(result.message);
       return;
     }
 
-    updateTask(task.id, { status: 'Completato' });
+    setFormValues({
+      title: '',
+      subject: subjectOptions[0]?.name || '',
+      dueDate: '',
+      startTime: ''
+    });
+    setFeedbackMessage('');
+    setIsFormVisible(false);
   }
 
-  function handleDeleteTask(taskId) {
+  async function handleToggleComplete(task) {
+    const result = task.status === 'Completato'
+      ? await updateTask(task.id, { ...task, status: 'Da fare' })
+      : await updateTask(task.id, { ...task, status: 'Completato' });
+
+    if (!result.success) {
+      window.alert(result.message);
+    }
+  }
+
+  async function handleDeleteTask(taskId) {
     const taskToDelete = tasks.find((task) => task.id === taskId);
 
     if (!taskToDelete) {
@@ -103,7 +114,11 @@ function TaskPanel({ isOpen, onOpen, onClose }) {
       return;
     }
 
-    deleteTask(taskId);
+    const result = await deleteTask(taskId);
+
+    if (!result.success) {
+      window.alert(result.message);
+    }
   }
 
   return (
@@ -178,9 +193,9 @@ function TaskPanel({ isOpen, onOpen, onClose }) {
                   value={formValues.subject}
                   onChange={handleFieldChange}
                 >
-                  {TASK_SUBJECT_OPTIONS.map((subject) => (
-                    <option key={subject} value={subject}>
-                      {subject}
+                  {subjectOptions.map((subject) => (
+                    <option key={subject.id || subject.name} value={subject.name || subject}>
+                      {subject.name || subject}
                     </option>
                   ))}
                 </select>
@@ -208,6 +223,10 @@ function TaskPanel({ isOpen, onOpen, onClose }) {
                 onChange={handleFieldChange}
               />
             </div>
+
+            {feedbackMessage ? (
+              <p className="entity-form__message">{feedbackMessage}</p>
+            ) : null}
 
             <button className="task-sidebar__submit" type="submit">
               Aggiungi task

@@ -1,9 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import {
-  INITIAL_EXAMS,
-  INITIAL_TASKS
-} from '../data/studyData';
-import {
   API_BASE_URL,
   clearAuthSession,
   getAuthHeaders,
@@ -55,51 +51,38 @@ function resolveThemeValue(theme) {
   return 'light';
 }
 
-function normalizeTask(task, fallbackId) {
-  const normalizedDate = task.dueDate?.trim() || '';
-  const normalizedStartHour = Number.isFinite(task.startHour) ? task.startHour : null;
-  const normalizedEndHour = Number.isFinite(task.endHour) ? task.endHour : null;
-
+function normalizeTask(task) {
   return {
-    id: task.id || fallbackId,
-    title: task.title.trim(),
-    status: task.status || 'Da fare',
+    id: task.id,
+    title: task.title,
     subject: task.subject,
-    notes: task.notes?.trim() || '',
-    dueDate: normalizedDate,
-    dayOffset: Number.isFinite(task.dayOffset) ? task.dayOffset : 0,
-    startHour: normalizedDate ? normalizedStartHour : null,
-    endHour: normalizedDate ? normalizedEndHour : null
+    status: task.status || 'Da fare',
+    notes: task.notes || '',
+    dueDate: task.dueDate || '',
+    startHour: Number.isFinite(task.startHour) ? task.startHour : null,
+    endHour: Number.isFinite(task.endHour) ? task.endHour : null
+  };
+}
+
+function normalizeExam(exam) {
+  return {
+    id: exam.id,
+    subject: exam.subject,
+    date: exam.date,
+    location: exam.location || 'Da definire'
   };
 }
 
 export function StudyDataProvider({ children }) {
   const [subjects, setSubjects] = useState([]);
-  const [exams] = useState(INITIAL_EXAMS);
-  const [tasks, setTasks] = useState(INITIAL_TASKS);
+  const [exams, setExams] = useState([]);
+  const [tasks, setTasks] = useState([]);
   const [currentUser, setCurrentUser] = useState(getStoredUser);
   const [settings, setSettings] = useState(() => buildSettingsFromUser(getStoredUser()));
   const [isUserLoading, setIsUserLoading] = useState(Boolean(getStoredToken()));
   const [isSubjectsLoading, setIsSubjectsLoading] = useState(Boolean(getStoredToken()));
-
-  function addTask(task) {
-    const nextTask = normalizeTask(task, `task-${Date.now()}`);
-    setTasks((currentTasks) => [...currentTasks, nextTask]);
-  }
-
-  function updateTask(taskId, updates) {
-    setTasks((currentTasks) =>
-      currentTasks.map((task) =>
-        task.id === taskId
-          ? normalizeTask({ ...task, ...updates, id: taskId }, taskId)
-          : task
-      )
-    );
-  }
-
-  function deleteTask(taskId) {
-    setTasks((currentTasks) => currentTasks.filter((task) => task.id !== taskId));
-  }
+  const [isTasksLoading, setIsTasksLoading] = useState(Boolean(getStoredToken()));
+  const [isExamsLoading, setIsExamsLoading] = useState(Boolean(getStoredToken()));
 
   async function refreshSubjects() {
     const token = getStoredToken();
@@ -130,6 +113,70 @@ export function StudyDataProvider({ children }) {
       setSubjects([]);
     } finally {
       setIsSubjectsLoading(false);
+    }
+  }
+
+  async function refreshTasks() {
+    const token = getStoredToken();
+
+    if (!token) {
+      setTasks([]);
+      setIsTasksLoading(false);
+      return;
+    }
+
+    try {
+      setIsTasksLoading(true);
+
+      const response = await fetch(`${API_BASE_URL}/api/tasks`, {
+        headers: {
+          ...getAuthHeaders()
+        }
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Impossibile recuperare le task.');
+      }
+
+      setTasks((data.tasks || []).map(normalizeTask));
+    } catch (error) {
+      setTasks([]);
+    } finally {
+      setIsTasksLoading(false);
+    }
+  }
+
+  async function refreshExams() {
+    const token = getStoredToken();
+
+    if (!token) {
+      setExams([]);
+      setIsExamsLoading(false);
+      return;
+    }
+
+    try {
+      setIsExamsLoading(true);
+
+      const response = await fetch(`${API_BASE_URL}/api/exams`, {
+        headers: {
+          ...getAuthHeaders()
+        }
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Impossibile recuperare gli esami.');
+      }
+
+      setExams((data.exams || []).map(normalizeExam));
+    } catch (error) {
+      setExams([]);
+    } finally {
+      setIsExamsLoading(false);
     }
   }
 
@@ -259,12 +306,262 @@ export function StudyDataProvider({ children }) {
     }
   }
 
+  async function addTask(taskData) {
+    const token = getStoredToken();
+
+    if (!token) {
+      return {
+        success: false,
+        message: 'Nessun utente autenticato.'
+      };
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/tasks`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        body: JSON.stringify(taskData)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Creazione task non riuscita.');
+      }
+
+      setTasks((currentTasks) => [...currentTasks, normalizeTask(data.task)]);
+
+      return {
+        success: true,
+        message: data.message || 'Task creata con successo.',
+        task: normalizeTask(data.task)
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message || 'Si e verificato un errore durante la creazione.'
+      };
+    }
+  }
+
+  async function updateTask(taskId, updates) {
+    const token = getStoredToken();
+
+    if (!token) {
+      return {
+        success: false,
+        message: 'Nessun utente autenticato.'
+      };
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/tasks/${taskId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        body: JSON.stringify(updates)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Aggiornamento task non riuscito.');
+      }
+
+      setTasks((currentTasks) =>
+        currentTasks.map((task) =>
+          task.id === taskId ? normalizeTask(data.task) : task
+        )
+      );
+
+      return {
+        success: true,
+        message: data.message || 'Task aggiornata con successo.',
+        task: normalizeTask(data.task)
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message || 'Si e verificato un errore durante il salvataggio.'
+      };
+    }
+  }
+
+  async function deleteTask(taskId) {
+    const token = getStoredToken();
+
+    if (!token) {
+      return {
+        success: false,
+        message: 'Nessun utente autenticato.'
+      };
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/tasks/${taskId}`, {
+        method: 'DELETE',
+        headers: {
+          ...getAuthHeaders()
+        }
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Eliminazione task non riuscita.');
+      }
+
+      setTasks((currentTasks) => currentTasks.filter((task) => task.id !== taskId));
+
+      return {
+        success: true,
+        message: data.message || 'Task eliminata con successo.'
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message || 'Si e verificato un errore durante l eliminazione.'
+      };
+    }
+  }
+
+  async function addExam(examData) {
+    const token = getStoredToken();
+
+    if (!token) {
+      return {
+        success: false,
+        message: 'Nessun utente autenticato.'
+      };
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/exams`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        body: JSON.stringify(examData)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Creazione esame non riuscita.');
+      }
+
+      setExams((currentExams) => [...currentExams, normalizeExam(data.exam)]);
+
+      return {
+        success: true,
+        message: data.message || 'Esame creato con successo.',
+        exam: normalizeExam(data.exam)
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message || 'Si e verificato un errore durante la creazione.'
+      };
+    }
+  }
+
+  async function updateExam(examId, examData) {
+    const token = getStoredToken();
+
+    if (!token) {
+      return {
+        success: false,
+        message: 'Nessun utente autenticato.'
+      };
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/exams/${examId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        body: JSON.stringify(examData)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Aggiornamento esame non riuscito.');
+      }
+
+      setExams((currentExams) =>
+        currentExams.map((exam) =>
+          exam.id === examId ? normalizeExam(data.exam) : exam
+        )
+      );
+
+      return {
+        success: true,
+        message: data.message || 'Esame aggiornato con successo.',
+        exam: normalizeExam(data.exam)
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message || 'Si e verificato un errore durante il salvataggio.'
+      };
+    }
+  }
+
+  async function deleteExam(examId) {
+    const token = getStoredToken();
+
+    if (!token) {
+      return {
+        success: false,
+        message: 'Nessun utente autenticato.'
+      };
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/exams/${examId}`, {
+        method: 'DELETE',
+        headers: {
+          ...getAuthHeaders()
+        }
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Eliminazione esame non riuscita.');
+      }
+
+      setExams((currentExams) => currentExams.filter((exam) => exam.id !== examId));
+
+      return {
+        success: true,
+        message: data.message || 'Esame eliminato con successo.'
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message || 'Si e verificato un errore durante l eliminazione.'
+      };
+    }
+  }
+
   async function refreshCurrentUser() {
     const token = getStoredToken();
 
     if (!token) {
       setCurrentUser(null);
       setSubjects([]);
+      setTasks([]);
+      setExams([]);
       setSettings((currentSettings) => ({
         ...DEFAULT_SETTINGS,
         theme: currentSettings.theme
@@ -294,11 +591,13 @@ export function StudyDataProvider({ children }) {
       });
       setCurrentUser(data.user);
       setSettings(buildSettingsFromUser(data.user));
-      await refreshSubjects();
+      await Promise.all([refreshSubjects(), refreshTasks(), refreshExams()]);
     } catch (error) {
       clearAuthSession();
       setCurrentUser(null);
       setSubjects([]);
+      setTasks([]);
+      setExams([]);
       setSettings((currentSettings) => ({
         ...DEFAULT_SETTINGS,
         theme: currentSettings.theme
@@ -416,18 +715,35 @@ export function StudyDataProvider({ children }) {
       currentUser,
       isUserLoading,
       isSubjectsLoading,
+      isTasksLoading,
+      isExamsLoading,
       settings,
-      addTask,
-      updateTask,
-      deleteTask,
       addSubject,
       updateSubject,
       deleteSubject,
+      addTask,
+      updateTask,
+      deleteTask,
+      addExam,
+      updateExam,
+      deleteExam,
       refreshCurrentUser,
       refreshSubjects,
+      refreshTasks,
+      refreshExams,
       updateSettings
     }),
-    [currentUser, exams, isSubjectsLoading, isUserLoading, settings, subjects, tasks]
+    [
+      currentUser,
+      exams,
+      isExamsLoading,
+      isSubjectsLoading,
+      isTasksLoading,
+      isUserLoading,
+      settings,
+      subjects,
+      tasks
+    ]
   );
 
   return <StudyDataContext.Provider value={value}>{children}</StudyDataContext.Provider>;
