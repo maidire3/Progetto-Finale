@@ -1,8 +1,78 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import '../styles/auth.css';
+import { API_BASE_URL, saveAuthSession } from '../utils/auth';
 
 function RegisterPage() {
+  const navigate = useNavigate();
+  const [formValues, setFormValues] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+  const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  function handleChange(event) {
+    const { name, value } = event.target;
+
+    setFormValues((currentValues) => ({
+      ...currentValues,
+      [name]: value
+    }));
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    setFeedbackMessage('');
+
+    if (!formValues.firstName || !formValues.lastName || !formValues.email || !formValues.password) {
+      setFeedbackMessage('Nome, cognome, email e password sono obbligatori.');
+      return;
+    }
+
+    if (formValues.password !== formValues.confirmPassword) {
+      setFeedbackMessage('Le password non coincidono.');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          firstName: formValues.firstName.trim(),
+          lastName: formValues.lastName.trim(),
+          email: formValues.email.trim(),
+          password: formValues.password
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Registrazione non riuscita.');
+      }
+
+      saveAuthSession({
+        token: data.token,
+        user: data.user
+      });
+
+      navigate('/dashboard');
+    } catch (error) {
+      setFeedbackMessage(error.message || 'Si e verificato un errore durante la registrazione.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
   return (
     <main className="auth-page">
       <section className="auth-card">
@@ -17,14 +87,28 @@ function RegisterPage() {
           </p>
         </div>
 
-        <form className="auth-form">
+        <form className="auth-form" onSubmit={handleSubmit}>
           <div className="auth-form__group">
-            <label htmlFor="name">Nome</label>
+            <label htmlFor="firstName">Nome</label>
             <input
-              id="name"
-              name="name"
+              id="firstName"
+              name="firstName"
               type="text"
               placeholder="Inserisci il tuo nome"
+              value={formValues.firstName}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="auth-form__group">
+            <label htmlFor="lastName">Cognome</label>
+            <input
+              id="lastName"
+              name="lastName"
+              type="text"
+              placeholder="Inserisci il tuo cognome"
+              value={formValues.lastName}
+              onChange={handleChange}
             />
           </div>
 
@@ -35,6 +119,8 @@ function RegisterPage() {
               name="email"
               type="email"
               placeholder="nome@universita.it"
+              value={formValues.email}
+              onChange={handleChange}
             />
           </div>
 
@@ -45,6 +131,8 @@ function RegisterPage() {
               name="password"
               type="password"
               placeholder="Crea una password"
+              value={formValues.password}
+              onChange={handleChange}
             />
           </div>
 
@@ -55,15 +143,17 @@ function RegisterPage() {
               name="confirmPassword"
               type="password"
               placeholder="Ripeti la password"
+              value={formValues.confirmPassword}
+              onChange={handleChange}
             />
           </div>
 
           <div className="auth-form__error" role="alert" aria-live="polite">
-            Nessun messaggio al momento.
+            {feedbackMessage || 'Crea il tuo account Study Tracker.'}
           </div>
 
-          <button className="auth-form__submit" type="submit">
-            Registrati
+          <button className="auth-form__submit" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Registrazione in corso...' : 'Registrati'}
           </button>
         </form>
 

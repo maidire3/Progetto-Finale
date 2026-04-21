@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import AppShell from './AppShell';
 import sidebarSections from '../../data/mockNavigation';
-
-const user = {
-  name: 'Davide',
-  initial: 'D'
-};
+import { formatUserForBadge, getStoredUser } from '../../utils/auth';
 
 function DashboardSectionLayout({
   title,
@@ -13,6 +9,7 @@ function DashboardSectionLayout({
   children
 }) {
   const [isTaskPanelOpen, setIsTaskPanelOpen] = useState(false);
+  const user = formatUserForBadge(getStoredUser());
 
   function handleOpenTaskPanel() {
     setIsTaskPanelOpen(true);

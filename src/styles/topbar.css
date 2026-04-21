@@ -100,10 +100,15 @@
 
 .user-menu__item {
   display: block;
+  width: 100%;
   padding: 12px 14px;
+  border: 0;
   border-radius: 12px;
+  background: transparent;
   color: #334155;
   font-weight: 600;
+  text-align: left;
+  cursor: pointer;
 }
 
 .user-menu__item:hover {

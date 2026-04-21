@@ -92,6 +92,12 @@
   box-shadow: 0 12px 30px rgba(37, 99, 235, 0.18);
 }
 
+.auth-form__submit:disabled {
+  opacity: 0.7;
+  cursor: wait;
+  box-shadow: none;
+}
+
 .auth-form__submit:hover {
   background: #1d4ed8;
 }

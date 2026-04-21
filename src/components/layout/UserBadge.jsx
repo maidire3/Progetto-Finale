@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { clearAuthSession } from '../../utils/auth';
 
 function UserBadge({ user }) {
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const badgeRef = useRef(null);
 
@@ -25,6 +27,12 @@ function UserBadge({ user }) {
 
   function handleCloseMenu() {
     setIsMenuOpen(false);
+  }
+
+  function handleLogout() {
+    clearAuthSession();
+    handleCloseMenu();
+    navigate('/login');
   }
 
   return (
@@ -67,14 +75,14 @@ function UserBadge({ user }) {
           >
             Impostazioni
           </Link>
-          <Link
+          <button
             className="user-menu__item user-menu__item--danger"
             role="menuitem"
-            to="/login"
-            onClick={handleCloseMenu}
+            type="button"
+            onClick={handleLogout}
           >
             Logout
-          </Link>
+          </button>
         </div>
       ) : null}
     </div>
