@@ -244,7 +244,9 @@ function TaskPanel({ isOpen, onOpen, onClose }) {
             >
               <span className="task-sidebar__dot" aria-hidden="true" />
               <div className="task-sidebar__item-content">
-                <p className="task-sidebar__item-title">{task.title}</p>
+                <p className="task-sidebar__item-title" title={task.title}>
+                  {task.title}
+                </p>
                 <p className="task-sidebar__item-meta">{task.meta}</p>
               </div>
 
