@@ -77,10 +77,10 @@ function formatUserForBadge(user) {
     };
   }
 
-  const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
+  const firstName = (user.firstName || '').trim();
 
   return {
-    name: fullName || user.email || 'Utente',
+    name: firstName || user.email || 'Utente',
     initial: (user.firstName || user.email || 'U').charAt(0).toUpperCase()
   };
 }
