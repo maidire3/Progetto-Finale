@@ -112,9 +112,13 @@ body[data-theme='dark'] .section-page__intro h2,
 body[data-theme='dark'] .section-card h3,
 body[data-theme='dark'] .section-list__item h3,
 body[data-theme='dark'] .settings-card__header h3,
+body[data-theme='dark'] .subject-modal__header h3,
 body[data-theme='dark'] .settings-field span,
 body[data-theme='dark'] .subject-card__schedule-value,
 body[data-theme='dark'] .entity-modal__header h3,
+body[data-theme='dark'] .subject-form__group label,
+body[data-theme='dark'] .subject-form__days-label,
+body[data-theme='dark'] .subject-form__schedule-toggle label,
 body[data-theme='dark'] .entity-form__group label,
 body[data-theme='dark'] .task-sidebar__header h2,
 body[data-theme='dark'] .task-panel-trigger__title,
@@ -165,6 +169,7 @@ body[data-theme='dark'] .dashboard-summary-card__label,
 body[data-theme='dark'] .dashboard-linked-card__label,
 body[data-theme='dark'] .dashboard-placeholder__eyebrow,
 body[data-theme='dark'] .section-card__label,
+body[data-theme='dark'] .subject-modal .section-card__label,
 body[data-theme='dark'] .task-panel-trigger__eyebrow,
 body[data-theme='dark'] .task-sidebar__eyebrow,
 body[data-theme='dark'] .weekly-calendar__today-label,
@@ -291,6 +296,28 @@ body[data-theme='dark'] .auth-form__error {
 body[data-theme='dark'] .entity-modal-backdrop {
   background: rgba(2, 6, 23, 0.62);
   backdrop-filter: blur(8px);
+}
+
+body[data-theme='dark'] .subject-modal-backdrop {
+  background: rgba(2, 6, 23, 0.62);
+  backdrop-filter: blur(8px);
+}
+
+body[data-theme='dark'] .subject-modal__header h3,
+body[data-theme='dark'] .subject-modal .section-card__label,
+body[data-theme='dark'] .subject-form__group label,
+body[data-theme='dark'] .subject-form__days-label,
+body[data-theme='dark'] .subject-form__schedule-toggle label {
+  color: #f8fafc;
+}
+
+body[data-theme='dark'] .subject-form__schedule-toggle label,
+body[data-theme='dark'] .subject-form__days-label,
+body[data-theme='dark'] .subject-form__day-option,
+body[data-theme='dark'] .subject-form__day-option span,
+body[data-theme='dark'] .subject-form__schedule-fields .subject-form__group label,
+body[data-theme='dark'] .subject-form__time-group label {
+  color: #0f172a;
 }
 
 body[data-theme='dark'] .feature-card__icon {
