@@ -7,9 +7,10 @@ import '../styles/topbar.css';
 import '../styles/task-panel.css';
 
 function SettingsPage() {
-  const { settings, updateSettings } = useStudyData();
+  const { isUserLoading, settings, updateSettings } = useStudyData();
   const [draftSettings, setDraftSettings] = useState(settings);
   const [saveMessage, setSaveMessage] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     setDraftSettings(settings);
@@ -25,10 +26,13 @@ function SettingsPage() {
     setSaveMessage('');
   }
 
-  function handleSave(event) {
+  async function handleSave(event) {
     event.preventDefault();
-    updateSettings(draftSettings);
-    setSaveMessage('Modifiche salvate localmente.');
+    setIsSaving(true);
+
+    const result = await updateSettings(draftSettings);
+    setSaveMessage(result.message);
+    setIsSaving(false);
   }
 
   return (
@@ -47,8 +51,9 @@ function SettingsPage() {
             className="section-page__primary-action"
             type="submit"
             form="settings-form"
+            disabled={isSaving || isUserLoading}
           >
-            Salva modifiche
+            {isSaving ? 'Salvataggio...' : 'Salva modifiche'}
           </button>
         </div>
 
@@ -88,9 +93,9 @@ function SettingsPage() {
               <label className="settings-field">
                 <span>Scuola / Universita</span>
                 <input
-                  name="university"
+                  name="school"
                   type="text"
-                  value={draftSettings.university}
+                  value={draftSettings.school}
                   onChange={handleFieldChange}
                 />
               </label>
@@ -98,9 +103,9 @@ function SettingsPage() {
               <label className="settings-field">
                 <span>Corso di studi</span>
                 <input
-                  name="degreeCourse"
+                  name="courseOfStudy"
                   type="text"
-                  value={draftSettings.degreeCourse}
+                  value={draftSettings.courseOfStudy}
                   onChange={handleFieldChange}
                 />
               </label>
@@ -126,8 +131,8 @@ function SettingsPage() {
                   value={draftSettings.language}
                   onChange={handleFieldChange}
                 >
-                  <option value="Italiano">Italiano</option>
-                  <option value="English">English</option>
+                  <option value="it">Italiano</option>
+                  <option value="en">English</option>
                 </select>
               </label>
 
@@ -151,8 +156,8 @@ function SettingsPage() {
                   value={draftSettings.weekStart}
                   onChange={handleFieldChange}
                 >
-                  <option value="Lunedi">Lunedi</option>
-                  <option value="Domenica">Domenica</option>
+                  <option value="monday">Lunedi</option>
+                  <option value="sunday">Domenica</option>
                 </select>
               </label>
             </div>
@@ -193,8 +198,12 @@ function SettingsPage() {
           </article>
 
           <div className="settings-form__footer">
-            <button className="section-page__primary-action" type="submit">
-              Salva modifiche
+            <button
+              className="section-page__primary-action"
+              type="submit"
+              disabled={isSaving || isUserLoading}
+            >
+              {isSaving ? 'Salvataggio...' : 'Salva modifiche'}
             </button>
             {saveMessage ? <p className="settings-form__message">{saveMessage}</p> : null}
           </div>

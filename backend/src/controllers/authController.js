@@ -1,21 +1,7 @@
 import bcrypt from 'bcrypt';
 import User from '../models/User.js';
 import generateToken from '../utils/generateToken.js';
-
-function sanitizeUser(user) {
-  return {
-    id: user._id,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    email: user.email,
-    school: user.school,
-    courseOfStudy: user.courseOfStudy,
-    language: user.language,
-    theme: user.theme,
-    createdAt: user.createdAt,
-    updatedAt: user.updatedAt
-  };
-}
+import sanitizeUser from '../utils/sanitizeUser.js';
 
 async function registerUser(req, res, next) {
   try {

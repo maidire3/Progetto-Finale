@@ -4,43 +4,44 @@ import {
   INITIAL_SUBJECTS,
   INITIAL_TASKS
 } from '../data/studyData';
+import {
+  API_BASE_URL,
+  clearAuthSession,
+  getAuthHeaders,
+  getStoredThemePreference,
+  getStoredToken,
+  getStoredUser,
+  saveAuthSession,
+  saveThemePreference
+} from '../utils/auth';
 
 const StudyDataContext = createContext(null);
-const SETTINGS_STORAGE_KEY = 'study-tracker-settings';
 
-const INITIAL_SETTINGS = {
-  firstName: 'Davide',
-  lastName: 'Rossi',
-  university: 'Universita di Bologna',
-  degreeCourse: 'Informatica',
-  language: 'Italiano',
-  theme: 'Chiaro',
-  weekStart: 'Lunedi',
+const DEFAULT_SETTINGS = {
+  firstName: '',
+  lastName: '',
+  school: '',
+  courseOfStudy: '',
+  language: 'it',
+  theme: 'Scuro',
+  weekStart: 'monday',
   plannerStartHour: '06:00',
   plannerEndHour: '22:00'
 };
 
-function getStoredSettings() {
-  if (typeof window === 'undefined') {
-    return INITIAL_SETTINGS;
-  }
-
-  try {
-    const rawSettings = window.localStorage.getItem(SETTINGS_STORAGE_KEY);
-
-    if (!rawSettings) {
-      return INITIAL_SETTINGS;
-    }
-
-    const parsedSettings = JSON.parse(rawSettings);
-
-    return {
-      ...INITIAL_SETTINGS,
-      ...parsedSettings
-    };
-  } catch (error) {
-    return INITIAL_SETTINGS;
-  }
+function buildSettingsFromUser(user, theme = getStoredThemePreference()) {
+  return {
+    ...DEFAULT_SETTINGS,
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
+    school: user?.school || '',
+    courseOfStudy: user?.courseOfStudy || '',
+    language: user?.language || 'it',
+    weekStart: user?.weekStart || 'monday',
+    plannerStartHour: user?.plannerStartHour || '06:00',
+    plannerEndHour: user?.plannerEndHour || '22:00',
+    theme
+  };
 }
 
 function resolveThemeValue(theme) {
@@ -77,7 +78,9 @@ export function StudyDataProvider({ children }) {
   const [subjects] = useState(INITIAL_SUBJECTS);
   const [exams] = useState(INITIAL_EXAMS);
   const [tasks, setTasks] = useState(INITIAL_TASKS);
-  const [settings, setSettings] = useState(getStoredSettings);
+  const [currentUser, setCurrentUser] = useState(getStoredUser);
+  const [settings, setSettings] = useState(() => buildSettingsFromUser(getStoredUser()));
+  const [isUserLoading, setIsUserLoading] = useState(Boolean(getStoredToken()));
 
   function addTask(task) {
     const nextTask = normalizeTask(task, `task-${Date.now()}`);
@@ -98,17 +101,122 @@ export function StudyDataProvider({ children }) {
     setTasks((currentTasks) => currentTasks.filter((task) => task.id !== taskId));
   }
 
-  function updateSettings(nextSettings) {
-    setSettings(nextSettings);
-  }
+  async function refreshCurrentUser() {
+    const token = getStoredToken();
 
-  useEffect(() => {
-    if (typeof window === 'undefined') {
+    if (!token) {
+      setCurrentUser(null);
+      setSettings((currentSettings) => ({
+        ...DEFAULT_SETTINGS,
+        theme: currentSettings.theme
+      }));
+      setIsUserLoading(false);
       return;
     }
 
-    window.localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
-  }, [settings]);
+    try {
+      setIsUserLoading(true);
+
+      const response = await fetch(`${API_BASE_URL}/api/users/me`, {
+        headers: {
+          ...getAuthHeaders()
+        }
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Impossibile recuperare il profilo utente.');
+      }
+
+      saveAuthSession({
+        token,
+        user: data.user
+      });
+      setCurrentUser(data.user);
+      setSettings(buildSettingsFromUser(data.user));
+    } catch (error) {
+      clearAuthSession();
+      setCurrentUser(null);
+      setSettings((currentSettings) => ({
+        ...DEFAULT_SETTINGS,
+        theme: currentSettings.theme
+      }));
+    } finally {
+      setIsUserLoading(false);
+    }
+  }
+
+  async function updateSettings(nextSettings) {
+    const nextTheme = nextSettings.theme || 'Scuro';
+
+    saveThemePreference(nextTheme);
+    setSettings((currentSettings) => ({
+      ...currentSettings,
+      ...nextSettings,
+      theme: nextTheme
+    }));
+
+    const token = getStoredToken();
+
+    if (!token) {
+      return {
+        success: false,
+        message: 'Nessun utente autenticato.'
+      };
+    }
+
+    const payload = {
+      firstName: nextSettings.firstName.trim(),
+      lastName: nextSettings.lastName.trim(),
+      school: nextSettings.school.trim(),
+      courseOfStudy: nextSettings.courseOfStudy.trim(),
+      language: nextSettings.language,
+      weekStart: nextSettings.weekStart,
+      plannerStartHour: nextSettings.plannerStartHour,
+      plannerEndHour: nextSettings.plannerEndHour
+    };
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/users/me`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Salvataggio impostazioni non riuscito.');
+      }
+
+      saveAuthSession({
+        token,
+        user: data.user
+      });
+      setCurrentUser(data.user);
+      setSettings(buildSettingsFromUser(data.user, nextTheme));
+
+      return {
+        success: true,
+        message: data.message || 'Impostazioni salvate con successo.'
+      };
+    } catch (error) {
+      setSettings(buildSettingsFromUser(currentUser, nextTheme));
+
+      return {
+        success: false,
+        message: error.message || 'Si e verificato un errore durante il salvataggio.'
+      };
+    }
+  }
+
+  useEffect(() => {
+    refreshCurrentUser();
+  }, []);
 
   useEffect(() => {
     if (typeof document === 'undefined') {
@@ -144,13 +252,16 @@ export function StudyDataProvider({ children }) {
       subjects,
       exams,
       tasks,
+      currentUser,
+      isUserLoading,
       settings,
       addTask,
       updateTask,
       deleteTask,
+      refreshCurrentUser,
       updateSettings
     }),
-    [exams, settings, subjects, tasks]
+    [currentUser, exams, isUserLoading, settings, subjects, tasks]
   );
 
   return <StudyDataContext.Provider value={value}>{children}</StudyDataContext.Provider>;

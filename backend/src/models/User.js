@@ -43,6 +43,21 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: 'dark',
       trim: true
+    },
+    weekStart: {
+      type: String,
+      default: 'monday',
+      trim: true
+    },
+    plannerStartHour: {
+      type: String,
+      default: '06:00',
+      trim: true
+    },
+    plannerEndHour: {
+      type: String,
+      default: '22:00',
+      trim: true
     }
   },
   {

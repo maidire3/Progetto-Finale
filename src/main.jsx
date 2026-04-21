@@ -1,24 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
+import { getStoredThemePreference } from './utils/auth';
 import './styles/globals.css';
 import './styles/theme.css';
 
 function resolveInitialTheme() {
   try {
-    const rawSettings = window.localStorage.getItem('study-tracker-settings');
+    const storedTheme = getStoredThemePreference();
 
-    if (!rawSettings) {
-      return 'light';
-    }
-
-    const parsedSettings = JSON.parse(rawSettings);
-
-    if (parsedSettings.theme === 'Scuro') {
+    if (storedTheme === 'Scuro') {
       return 'dark';
     }
 
-    if (parsedSettings.theme === 'Sistema' && window.matchMedia) {
+    if (storedTheme === 'Sistema' && window.matchMedia) {
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
   } catch (error) {

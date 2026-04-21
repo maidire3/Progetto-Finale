@@ -73,7 +73,7 @@ function createHours(startHour, endHour) {
 function getWeekStartDate(referenceDate, weekStart) {
   const startDate = new Date(referenceDate);
   const currentDay = startDate.getDay();
-  const firstDayIndex = weekStart === 'Domenica' ? 0 : 1;
+  const firstDayIndex = weekStart === 'Domenica' || weekStart === 'sunday' ? 0 : 1;
   const offset = (currentDay - firstDayIndex + 7) % 7;
 
   startDate.setDate(startDate.getDate() - offset);
