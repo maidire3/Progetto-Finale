@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import deleteIcon from '../assets/icons8-delete-48.png';
 import settingsIcon from '../assets/icons8-settings-50.png';
 import DashboardSectionLayout from '../components/layout/DashboardSectionLayout';
@@ -27,6 +28,8 @@ function ExamsPage() {
     subjects,
     updateExam
   } = useStudyData();
+  const location = useLocation();
+  const navigate = useNavigate();
   const subjectOptions = getExamSubjectOptions(subjects);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingExamId, setEditingExamId] = useState(null);
@@ -38,6 +41,23 @@ function ExamsPage() {
     () => exams.find((exam) => exam.id === editingExamId) || null,
     [editingExamId, exams]
   );
+
+  useEffect(() => {
+    const openResource = location.state?.openResource;
+
+    if (!openResource || openResource.type !== 'exam' || openResource.action !== 'edit') {
+      return;
+    }
+
+    const targetExam = exams.find((exam) => exam.id === openResource.targetId);
+
+    if (!targetExam) {
+      return;
+    }
+
+    openEditModal(targetExam);
+    navigate(location.pathname, { replace: true, state: null });
+  }, [exams, location.pathname, location.state, navigate]);
 
   function openCreateModal() {
     setEditingExamId(null);

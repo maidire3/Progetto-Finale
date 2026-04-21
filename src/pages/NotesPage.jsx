@@ -1,34 +1,14 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import deleteIcon from '../assets/icons8-delete-48.png';
 import settingsIcon from '../assets/icons8-settings-50.png';
 import DashboardSectionLayout from '../components/layout/DashboardSectionLayout';
+import { NOTE_FOLDER_OPTIONS } from '../data/studyData';
+import { useStudyData } from '../context/StudyDataContext';
 import '../styles/dashboard.css';
 import '../styles/sidebar.css';
 import '../styles/topbar.css';
 import '../styles/task-panel.css';
-
-const NOTE_FOLDER_OPTIONS = ['Analisi 2', 'Statistica', 'Database', 'Generale'];
-
-const INITIAL_NOTES = [
-  {
-    id: 'note-1',
-    title: 'Cartella Analisi 2',
-    folder: 'Analisi 2',
-    summary: 'Formule, appunti lezione e esercizi svolti.'
-  },
-  {
-    id: 'note-2',
-    title: 'Riassunti di Statistica',
-    folder: 'Statistica',
-    summary: 'Schemi rapidi per distribuzioni e test.'
-  },
-  {
-    id: 'note-3',
-    title: 'Laboratorio Database',
-    folder: 'Database',
-    summary: 'Query utili, esempi di join e normalizzazione.'
-  }
-];
 
 const EMPTY_NOTE_FORM = {
   id: '',
@@ -38,7 +18,9 @@ const EMPTY_NOTE_FORM = {
 };
 
 function NotesPage() {
-  const [notes, setNotes] = useState(INITIAL_NOTES);
+  const { addNote, deleteNote, notes, updateNote } = useStudyData();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingNoteId, setEditingNoteId] = useState(null);
   const [formValues, setFormValues] = useState(EMPTY_NOTE_FORM);
@@ -47,6 +29,23 @@ function NotesPage() {
     () => notes.find((note) => note.id === editingNoteId) || null,
     [editingNoteId, notes]
   );
+
+  useEffect(() => {
+    const openResource = location.state?.openResource;
+
+    if (!openResource || openResource.type !== 'note' || openResource.action !== 'edit') {
+      return;
+    }
+
+    const targetNote = notes.find((note) => note.id === openResource.targetId);
+
+    if (!targetNote) {
+      return;
+    }
+
+    openEditModal(targetNote);
+    navigate(location.pathname, { replace: true, state: null });
+  }, [location.pathname, location.state, navigate, notes]);
 
   function openCreateModal() {
     setEditingNoteId(null);
@@ -91,13 +90,9 @@ function NotesPage() {
     };
 
     if (editingNote) {
-      setNotes((currentNotes) =>
-        currentNotes.map((note) =>
-          note.id === editingNote.id ? { ...note, ...payload } : note
-        )
-      );
+      updateNote(editingNote.id, payload);
     } else {
-      setNotes((currentNotes) => [...currentNotes, payload]);
+      addNote(payload);
     }
 
     closeModal();
@@ -114,7 +109,7 @@ function NotesPage() {
       return;
     }
 
-    setNotes((currentNotes) => currentNotes.filter((note) => note.id !== noteId));
+    deleteNote(noteId);
   }
 
   return (

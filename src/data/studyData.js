@@ -150,6 +150,29 @@ export const INITIAL_EXAMS = [
   { id: 'exam-3', subject: 'Basi di dati', date: '2026-06-03', location: 'Aula Magna' }
 ];
 
+export const NOTE_FOLDER_OPTIONS = ['Analisi 2', 'Statistica', 'Database', 'Generale'];
+
+export const INITIAL_NOTES = [
+  {
+    id: 'note-1',
+    title: 'Cartella Analisi 2',
+    folder: 'Analisi 2',
+    summary: 'Formule, appunti lezione e esercizi svolti.'
+  },
+  {
+    id: 'note-2',
+    title: 'Riassunti di Statistica',
+    folder: 'Statistica',
+    summary: 'Schemi rapidi per distribuzioni e test.'
+  },
+  {
+    id: 'note-3',
+    title: 'Laboratorio Database',
+    folder: 'Database',
+    summary: 'Query utili, esempi di join e normalizzazione.'
+  }
+];
+
 export const TASK_SUBJECT_OPTIONS = [
   GENERAL_SUBJECT_OPTION.name,
   ...INITIAL_SUBJECTS.map((subject) => subject.name)

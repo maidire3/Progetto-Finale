@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import deleteIcon from '../assets/icons8-delete-48.png';
 import settingsIcon from '../assets/icons8-settings-50.png';
 import TaskModal from '../components/dashboard/TaskModal';
@@ -32,6 +33,8 @@ function TasksPage() {
     deleteTask,
     isTasksLoading
   } = useStudyData();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState(null);
   const subjectOptions = getTaskSubjectOptions(subjects);
@@ -43,6 +46,23 @@ function TasksPage() {
     () => tasks.find((task) => task.id === editingTaskId) || null,
     [editingTaskId, tasks]
   );
+
+  useEffect(() => {
+    const openResource = location.state?.openResource;
+
+    if (!openResource || openResource.type !== 'task' || openResource.action !== 'edit') {
+      return;
+    }
+
+    const targetTask = tasks.find((task) => task.id === openResource.targetId);
+
+    if (!targetTask) {
+      return;
+    }
+
+    openEditModal(targetTask);
+    navigate(location.pathname, { replace: true, state: null });
+  }, [location.pathname, location.state, navigate, tasks]);
 
   function openCreateModal() {
     setEditingTaskId(null);

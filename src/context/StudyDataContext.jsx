@@ -9,6 +9,7 @@ import {
   saveAuthSession,
   saveThemePreference
 } from '../utils/auth';
+import { INITIAL_NOTES } from '../data/studyData';
 
 const StudyDataContext = createContext(null);
 
@@ -73,10 +74,20 @@ function normalizeExam(exam) {
   };
 }
 
+function normalizeNote(note) {
+  return {
+    id: note.id,
+    title: note.title,
+    folder: note.folder || 'Generale',
+    summary: note.summary || ''
+  };
+}
+
 export function StudyDataProvider({ children }) {
   const [subjects, setSubjects] = useState([]);
   const [exams, setExams] = useState([]);
   const [tasks, setTasks] = useState([]);
+  const [notes, setNotes] = useState(() => INITIAL_NOTES.map(normalizeNote));
   const [currentUser, setCurrentUser] = useState(getStoredUser);
   const [settings, setSettings] = useState(() => buildSettingsFromUser(getStoredUser()));
   const [isUserLoading, setIsUserLoading] = useState(Boolean(getStoredToken()));
@@ -568,6 +579,56 @@ export function StudyDataProvider({ children }) {
     }
   }
 
+  function addNote(noteData) {
+    const normalizedNote = normalizeNote({
+      id: noteData.id || `note-${Date.now()}`,
+      ...noteData
+    });
+
+    setNotes((currentNotes) => [...currentNotes, normalizedNote]);
+
+    return {
+      success: true,
+      message: 'Nota creata con successo.',
+      note: normalizedNote
+    };
+  }
+
+  function updateNote(noteId, updates) {
+    const existingNote = notes.find((note) => note.id === noteId);
+
+    if (!existingNote) {
+      return {
+        success: false,
+        message: 'Nota non trovata.'
+      };
+    }
+
+    const normalizedNote = normalizeNote({
+      ...existingNote,
+      ...updates
+    });
+
+    setNotes((currentNotes) =>
+      currentNotes.map((note) => (note.id === noteId ? normalizedNote : note))
+    );
+
+    return {
+      success: true,
+      message: 'Nota aggiornata con successo.',
+      note: normalizedNote
+    };
+  }
+
+  function deleteNote(noteId) {
+    setNotes((currentNotes) => currentNotes.filter((note) => note.id !== noteId));
+
+    return {
+      success: true,
+      message: 'Nota eliminata con successo.'
+    };
+  }
+
   async function refreshCurrentUser() {
     const token = getStoredToken();
 
@@ -726,6 +787,7 @@ export function StudyDataProvider({ children }) {
       subjects,
       exams,
       tasks,
+      notes,
       currentUser,
       isUserLoading,
       isSubjectsLoading,
@@ -741,6 +803,9 @@ export function StudyDataProvider({ children }) {
       addExam,
       updateExam,
       deleteExam,
+      addNote,
+      updateNote,
+      deleteNote,
       refreshCurrentUser,
       refreshSubjects,
       refreshTasks,
@@ -756,7 +821,8 @@ export function StudyDataProvider({ children }) {
       isUserLoading,
       settings,
       subjects,
-      tasks
+      tasks,
+      notes
     ]
   );
 

@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import deleteIcon from '../assets/icons8-delete-48.png';
 import settingsIcon from '../assets/icons8-settings-50.png';
 import DashboardSectionLayout from '../components/layout/DashboardSectionLayout';
@@ -34,6 +35,8 @@ function SubjectsPage() {
     updateTask,
     updateSubject
   } = useStudyData();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isTasksModalOpen, setIsTasksModalOpen] = useState(false);
   const [editingSubjectId, setEditingSubjectId] = useState(null);
@@ -71,6 +74,27 @@ function SubjectsPage() {
         return firstHour - secondHour;
       });
   }, [selectedSubject, tasks]);
+
+  useEffect(() => {
+    const openResource = location.state?.openResource;
+
+    if (
+      !openResource ||
+      openResource.type !== 'subject' ||
+      openResource.action !== 'open-tasks-summary'
+    ) {
+      return;
+    }
+
+    const targetSubject = subjects.find((subject) => subject.id === openResource.targetId);
+
+    if (!targetSubject) {
+      return;
+    }
+
+    openTasksModal(targetSubject);
+    navigate(location.pathname, { replace: true, state: null });
+  }, [location.pathname, location.state, navigate, subjects]);
 
   function openCreateModal() {
     setEditingSubjectId(null);
