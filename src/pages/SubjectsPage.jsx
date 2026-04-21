@@ -27,13 +27,17 @@ function SubjectsPage() {
   const {
     addSubject,
     deleteSubject,
+    deleteTask,
     isSubjectsLoading,
     subjects,
     tasks,
+    updateTask,
     updateSubject
   } = useStudyData();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isTasksModalOpen, setIsTasksModalOpen] = useState(false);
   const [editingSubjectId, setEditingSubjectId] = useState(null);
+  const [selectedSubjectId, setSelectedSubjectId] = useState(null);
   const [formValues, setFormValues] = useState(EMPTY_FORM);
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,6 +46,31 @@ function SubjectsPage() {
     () => subjects.find((subject) => subject.id === editingSubjectId) || null,
     [editingSubjectId, subjects]
   );
+  const selectedSubject = useMemo(
+    () => subjects.find((subject) => subject.id === selectedSubjectId) || null,
+    [selectedSubjectId, subjects]
+  );
+  const selectedSubjectTasks = useMemo(() => {
+    if (!selectedSubject) {
+      return [];
+    }
+
+    return [...tasks]
+      .filter((task) => task.subject === selectedSubject.name)
+      .sort((firstTask, secondTask) => {
+        const firstDate = firstTask.dueDate || '9999-12-31';
+        const secondDate = secondTask.dueDate || '9999-12-31';
+
+        if (firstDate !== secondDate) {
+          return firstDate.localeCompare(secondDate);
+        }
+
+        const firstHour = Number.isFinite(firstTask.startHour) ? firstTask.startHour : 99;
+        const secondHour = Number.isFinite(secondTask.startHour) ? secondTask.startHour : 99;
+
+        return firstHour - secondHour;
+      });
+  }, [selectedSubject, tasks]);
 
   function openCreateModal() {
     setEditingSubjectId(null);
@@ -70,6 +99,16 @@ function SubjectsPage() {
     setEditingSubjectId(null);
     setFormValues(EMPTY_FORM);
     setFeedbackMessage('');
+  }
+
+  function openTasksModal(subject) {
+    setSelectedSubjectId(subject.id);
+    setIsTasksModalOpen(true);
+  }
+
+  function closeTasksModal() {
+    setSelectedSubjectId(null);
+    setIsTasksModalOpen(false);
   }
 
   function handleNameChange(event) {
@@ -176,6 +215,43 @@ function SubjectsPage() {
     }
   }
 
+  async function handleCompleteTask(taskId) {
+    const result = await updateTask(taskId, { status: 'Completato' });
+
+    if (!result.success) {
+      window.alert(result.message);
+    }
+  }
+
+  async function handleDeleteTask(taskId) {
+    const taskToDelete = selectedSubjectTasks.find((task) => task.id === taskId);
+    const confirmed = window.confirm(
+      `Vuoi eliminare la task "${taskToDelete?.title || 'selezionata'}"?`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    const result = await deleteTask(taskId);
+
+    if (!result.success) {
+      window.alert(result.message);
+    }
+  }
+
+  function getTaskMeta(task) {
+    if (!task.dueDate) {
+      return 'Data non pianificata';
+    }
+
+    const timeLabel = Number.isFinite(task.startHour)
+      ? ` alle ${String(task.startHour).padStart(2, '0')}:00`
+      : '';
+
+    return `${task.dueDate}${timeLabel}`;
+  }
+
   return (
     <DashboardSectionLayout title="Materie" eyebrow="Study">
       <section className="section-page">
@@ -212,10 +288,15 @@ function SubjectsPage() {
         {!isSubjectsLoading && subjects.length > 0 ? (
         <div className="section-grid section-grid--subjects">
           {subjects.map((subject) => (
-            <article
-              className={`subject-card subject-card--${subject.color}`}
-              key={subject.id}
-            >
+            <article className={`subject-card subject-card--${subject.color}`} key={subject.id}>
+              {(() => {
+                const activeTaskCount = tasks.filter(
+                  (task) =>
+                    task.subject === subject.name && task.status !== 'Completato'
+                ).length;
+
+                return (
+                  <>
               <div className="subject-card__top">
                 <div>
                   <p className="section-card__label">Materia</p>
@@ -253,9 +334,13 @@ function SubjectsPage() {
               <p className="subject-card__description">{subject.description}</p>
 
               <div className="subject-card__meta-row">
-                <span className="subject-card__pill">
-                  {tasks.filter((task) => task.subject === subject.name).length} task attive
-                </span>
+                <button
+                  className="subject-card__pill subject-card__pill--interactive"
+                  type="button"
+                  onClick={() => openTasksModal(subject)}
+                >
+                  {activeTaskCount} task attive
+                </button>
                 <span className="subject-card__pill subject-card__pill--secondary">
                   <span
                     className="subject-card__swatch"
@@ -274,6 +359,9 @@ function SubjectsPage() {
                   {formatSubjectSchedule(subject)}
                 </p>
               </div>
+                  </>
+                );
+              })()}
             </article>
           ))}
         </div>
@@ -423,6 +511,73 @@ function SubjectsPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      ) : null}
+
+      {isTasksModalOpen && selectedSubject ? (
+        <div className="subject-tasks-modal-backdrop" role="presentation">
+          <div
+            aria-labelledby="subject-tasks-modal-title"
+            aria-modal="true"
+            className="subject-tasks-modal"
+            role="dialog"
+          >
+            <div className="subject-modal__header">
+              <div>
+                <p className="section-card__label">Task della materia</p>
+                <h3 id="subject-tasks-modal-title">{selectedSubject.name}</h3>
+                <p className="subject-tasks-modal__count">
+                  {selectedSubjectTasks.length} task collegate
+                </p>
+              </div>
+
+              <button
+                className="subject-modal__close"
+                type="button"
+                onClick={closeTasksModal}
+              >
+                Chiudi
+              </button>
+            </div>
+
+            {selectedSubjectTasks.length === 0 ? (
+              <div className="subject-tasks-modal__empty">
+                <p>Nessuna task collegata a questa materia.</p>
+              </div>
+            ) : (
+              <div className="subject-tasks-modal__list">
+                {selectedSubjectTasks.map((task) => (
+                  <article className="subject-task-item" key={task.id}>
+                    <div className="subject-task-item__content">
+                      <div>
+                        <p className="subject-task-item__title">{task.title}</p>
+                        <p className="subject-task-item__meta">{getTaskMeta(task)}</p>
+                      </div>
+                      <span className="subject-task-item__status">{task.status}</span>
+                    </div>
+
+                    <div className="subject-task-item__actions">
+                      <button
+                        className="subject-task-item__button"
+                        type="button"
+                        onClick={() => handleCompleteTask(task.id)}
+                        disabled={task.status === 'Completato'}
+                      >
+                        Completa
+                      </button>
+                      <button
+                        className="subject-task-item__button subject-task-item__button--danger"
+                        type="button"
+                        onClick={() => handleDeleteTask(task.id)}
+                      >
+                        Elimina
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       ) : null}

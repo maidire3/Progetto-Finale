@@ -303,6 +303,11 @@ body[data-theme='dark'] .subject-modal-backdrop {
   backdrop-filter: blur(8px);
 }
 
+body[data-theme='dark'] .subject-tasks-modal-backdrop {
+  background: rgba(2, 6, 23, 0.62);
+  backdrop-filter: blur(8px);
+}
+
 body[data-theme='dark'] .subject-modal__header h3,
 body[data-theme='dark'] .subject-modal .section-card__label,
 body[data-theme='dark'] .subject-form__group label,
@@ -318,6 +323,36 @@ body[data-theme='dark'] .subject-form__day-option span,
 body[data-theme='dark'] .subject-form__schedule-fields .subject-form__group label,
 body[data-theme='dark'] .subject-form__time-group label {
   color: #0f172a;
+}
+
+body[data-theme='dark'] .subject-tasks-modal,
+body[data-theme='dark'] .subject-task-item,
+body[data-theme='dark'] .subject-task-item__button {
+  background: rgba(15, 23, 42, 0.96);
+}
+
+body[data-theme='dark'] .subject-tasks-modal,
+body[data-theme='dark'] .subject-task-item,
+body[data-theme='dark'] .subject-task-item__button {
+  border-color: rgba(71, 85, 105, 0.34);
+}
+
+body[data-theme='dark'] .subject-tasks-modal__count,
+body[data-theme='dark'] .subject-tasks-modal__empty,
+body[data-theme='dark'] .subject-task-item__meta {
+  color: #94a3b8;
+}
+
+body[data-theme='dark'] .subject-task-item__title {
+  color: #f8fafc;
+}
+
+body[data-theme='dark'] .subject-task-item__button {
+  color: #e2e8f0;
+}
+
+body[data-theme='dark'] .subject-card__pill--interactive:hover {
+  background: rgba(15, 23, 42, 0.92);
 }
 
 body[data-theme='dark'] .feature-card__icon {

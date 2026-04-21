@@ -357,6 +357,20 @@ export function StudyDataProvider({ children }) {
       };
     }
 
+    const existingTask = tasks.find((task) => task.id === taskId);
+
+    if (!existingTask) {
+      return {
+        success: false,
+        message: 'Task non trovata.'
+      };
+    }
+
+    const payload = {
+      ...existingTask,
+      ...updates
+    };
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/tasks/${taskId}`, {
         method: 'PUT',
@@ -364,7 +378,7 @@ export function StudyDataProvider({ children }) {
           'Content-Type': 'application/json',
           ...getAuthHeaders()
         },
-        body: JSON.stringify(updates)
+        body: JSON.stringify(payload)
       });
 
       const data = await response.json();
