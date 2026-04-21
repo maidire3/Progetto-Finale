@@ -202,6 +202,24 @@
   align-items: stretch;
 }
 
+.section-empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+  padding: 24px;
+  border: 1px dashed rgba(148, 163, 184, 0.22);
+  border-radius: 24px;
+  background: rgba(252, 253, 251, 0.76);
+}
+
+.section-empty-state p,
+.entity-form__message {
+  margin: 0;
+  color: #526072;
+  text-align: center;
+}
+
 .section-card {
   display: flex;
   flex-direction: column;
@@ -591,6 +609,11 @@
 .entity-form__group textarea {
   min-height: 116px;
   resize: vertical;
+}
+
+.entity-form__message {
+  color: #b45309;
+  font-weight: 600;
 }
 
 .entity-form__row {

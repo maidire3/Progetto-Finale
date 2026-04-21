@@ -5,7 +5,6 @@ import DashboardSectionLayout from '../components/layout/DashboardSectionLayout'
 import { useStudyData } from '../context/StudyDataContext';
 import {
   COLOR_OPTIONS,
-  INITIAL_SUBJECTS,
   WEEK_DAYS,
   formatSubjectSchedule
 } from '../data/studyData';
@@ -25,11 +24,19 @@ const EMPTY_FORM = {
 };
 
 function SubjectsPage() {
-  const { tasks } = useStudyData();
-  const [subjects, setSubjects] = useState(INITIAL_SUBJECTS);
+  const {
+    addSubject,
+    deleteSubject,
+    isSubjectsLoading,
+    subjects,
+    tasks,
+    updateSubject
+  } = useStudyData();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingSubjectId, setEditingSubjectId] = useState(null);
   const [formValues, setFormValues] = useState(EMPTY_FORM);
+  const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const editingSubject = useMemo(
     () => subjects.find((subject) => subject.id === editingSubjectId) || null,
@@ -39,6 +46,7 @@ function SubjectsPage() {
   function openCreateModal() {
     setEditingSubjectId(null);
     setFormValues(EMPTY_FORM);
+    setFeedbackMessage('');
     setIsModalOpen(true);
   }
 
@@ -53,6 +61,7 @@ function SubjectsPage() {
       startTime: subject.startTime,
       endTime: subject.endTime
     });
+    setFeedbackMessage('');
     setIsModalOpen(true);
   }
 
@@ -60,6 +69,7 @@ function SubjectsPage() {
     setIsModalOpen(false);
     setEditingSubjectId(null);
     setFormValues(EMPTY_FORM);
+    setFeedbackMessage('');
   }
 
   function handleNameChange(event) {
@@ -105,41 +115,46 @@ function SubjectsPage() {
     });
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
 
     const trimmedName = formValues.name.trim();
 
     if (!trimmedName) {
+      setFeedbackMessage('Il nome materia e obbligatorio.');
       return;
     }
 
     const subjectPayload = {
-      id: editingSubject ? editingSubject.id : `subject-${Date.now()}`,
       name: trimmedName,
-      description: editingSubject?.description || 'Materia personalizzata creata nella dashboard.',
       color: formValues.color,
-      taskCount: editingSubject?.taskCount || 0,
       scheduleEnabled: formValues.scheduleEnabled,
       scheduleDays: formValues.scheduleEnabled ? formValues.scheduleDays : [],
       startTime: formValues.startTime,
       endTime: formValues.endTime
     };
 
+    setIsSubmitting(true);
+
+    const result = editingSubject
+      ? await updateSubject(editingSubject.id, subjectPayload)
+      : await addSubject(subjectPayload);
+
+    setIsSubmitting(false);
+
+    if (!result.success) {
+      setFeedbackMessage(result.message);
+      return;
+    }
+
     if (editingSubject) {
-      setSubjects((currentSubjects) =>
-        currentSubjects.map((subject) =>
-          subject.id === editingSubject.id ? { ...subject, ...subjectPayload } : subject
-        )
-      );
-    } else {
-      setSubjects((currentSubjects) => [...currentSubjects, subjectPayload]);
+      setFeedbackMessage('Materia aggiornata con successo.');
     }
 
     closeModal();
   }
 
-  function handleDeleteSubject(subjectId) {
+  async function handleDeleteSubject(subjectId) {
     const subjectToDelete = subjects.find((subject) => subject.id === subjectId);
 
     if (!subjectToDelete) {
@@ -154,9 +169,11 @@ function SubjectsPage() {
       return;
     }
 
-    setSubjects((currentSubjects) =>
-      currentSubjects.filter((subject) => subject.id !== subjectId)
-    );
+    const result = await deleteSubject(subjectId);
+
+    if (!result.success) {
+      window.alert(result.message);
+    }
   }
 
   return (
@@ -180,6 +197,19 @@ function SubjectsPage() {
           </button>
         </div>
 
+        {isSubjectsLoading ? (
+          <div className="section-empty-state">
+            <p>Caricamento materie in corso...</p>
+          </div>
+        ) : null}
+
+        {!isSubjectsLoading && subjects.length === 0 ? (
+          <div className="section-empty-state">
+            <p>Nessuna materia ancora creata. Inizia con la prima materia del semestre.</p>
+          </div>
+        ) : null}
+
+        {!isSubjectsLoading && subjects.length > 0 ? (
         <div className="section-grid section-grid--subjects">
           {subjects.map((subject) => (
             <article
@@ -240,6 +270,7 @@ function SubjectsPage() {
             </article>
           ))}
         </div>
+        ) : null}
       </section>
 
       {isModalOpen ? (
@@ -353,6 +384,10 @@ function SubjectsPage() {
                 </div>
               ) : null}
 
+              {feedbackMessage ? (
+                <p className="entity-form__message">{feedbackMessage}</p>
+              ) : null}
+
               <div className="subject-form__actions">
                 <button
                   className="subject-form__button subject-form__button--secondary"
@@ -361,8 +396,12 @@ function SubjectsPage() {
                 >
                   Annulla
                 </button>
-                <button className="subject-form__button" type="submit">
-                  {editingSubject ? 'Salva modifiche' : 'Aggiungi materia'}
+                <button className="subject-form__button" type="submit" disabled={isSubmitting}>
+                  {isSubmitting
+                    ? 'Salvataggio...'
+                    : editingSubject
+                      ? 'Salva modifiche'
+                      : 'Aggiungi materia'}
                 </button>
               </div>
             </form>

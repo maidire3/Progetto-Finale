@@ -22,7 +22,7 @@ const EMPTY_TASK_FORM = {
 };
 
 function TasksPage() {
-  const { tasks, addTask, updateTask, deleteTask } = useStudyData();
+  const { subjects, tasks, addTask, updateTask, deleteTask } = useStudyData();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [formValues, setFormValues] = useState(EMPTY_TASK_FORM);
@@ -203,7 +203,7 @@ function TasksPage() {
         onClose={closeModal}
         onFieldChange={handleFieldChange}
         onSubmit={handleSubmit}
-        subjectOptions={INITIAL_SUBJECTS}
+        subjectOptions={subjects.length > 0 ? subjects : INITIAL_SUBJECTS}
       />
     </DashboardSectionLayout>
   );

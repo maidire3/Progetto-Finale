@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import {
   INITIAL_EXAMS,
-  INITIAL_SUBJECTS,
   INITIAL_TASKS
 } from '../data/studyData';
 import {
@@ -75,12 +74,13 @@ function normalizeTask(task, fallbackId) {
 }
 
 export function StudyDataProvider({ children }) {
-  const [subjects] = useState(INITIAL_SUBJECTS);
+  const [subjects, setSubjects] = useState([]);
   const [exams] = useState(INITIAL_EXAMS);
   const [tasks, setTasks] = useState(INITIAL_TASKS);
   const [currentUser, setCurrentUser] = useState(getStoredUser);
   const [settings, setSettings] = useState(() => buildSettingsFromUser(getStoredUser()));
   const [isUserLoading, setIsUserLoading] = useState(Boolean(getStoredToken()));
+  const [isSubjectsLoading, setIsSubjectsLoading] = useState(Boolean(getStoredToken()));
 
   function addTask(task) {
     const nextTask = normalizeTask(task, `task-${Date.now()}`);
@@ -101,11 +101,170 @@ export function StudyDataProvider({ children }) {
     setTasks((currentTasks) => currentTasks.filter((task) => task.id !== taskId));
   }
 
+  async function refreshSubjects() {
+    const token = getStoredToken();
+
+    if (!token) {
+      setSubjects([]);
+      setIsSubjectsLoading(false);
+      return;
+    }
+
+    try {
+      setIsSubjectsLoading(true);
+
+      const response = await fetch(`${API_BASE_URL}/api/subjects`, {
+        headers: {
+          ...getAuthHeaders()
+        }
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Impossibile recuperare le materie.');
+      }
+
+      setSubjects(data.subjects || []);
+    } catch (error) {
+      setSubjects([]);
+    } finally {
+      setIsSubjectsLoading(false);
+    }
+  }
+
+  async function addSubject(subjectData) {
+    const token = getStoredToken();
+
+    if (!token) {
+      return {
+        success: false,
+        message: 'Nessun utente autenticato.'
+      };
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/subjects`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        body: JSON.stringify(subjectData)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Creazione materia non riuscita.');
+      }
+
+      setSubjects((currentSubjects) => [...currentSubjects, data.subject]);
+
+      return {
+        success: true,
+        message: data.message || 'Materia creata con successo.',
+        subject: data.subject
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message || 'Si e verificato un errore durante la creazione.'
+      };
+    }
+  }
+
+  async function updateSubject(subjectId, subjectData) {
+    const token = getStoredToken();
+
+    if (!token) {
+      return {
+        success: false,
+        message: 'Nessun utente autenticato.'
+      };
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/subjects/${subjectId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        body: JSON.stringify(subjectData)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Aggiornamento materia non riuscito.');
+      }
+
+      setSubjects((currentSubjects) =>
+        currentSubjects.map((subject) =>
+          subject.id === subjectId ? data.subject : subject
+        )
+      );
+
+      return {
+        success: true,
+        message: data.message || 'Materia aggiornata con successo.',
+        subject: data.subject
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message || 'Si e verificato un errore durante il salvataggio.'
+      };
+    }
+  }
+
+  async function deleteSubject(subjectId) {
+    const token = getStoredToken();
+
+    if (!token) {
+      return {
+        success: false,
+        message: 'Nessun utente autenticato.'
+      };
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/subjects/${subjectId}`, {
+        method: 'DELETE',
+        headers: {
+          ...getAuthHeaders()
+        }
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Eliminazione materia non riuscita.');
+      }
+
+      setSubjects((currentSubjects) =>
+        currentSubjects.filter((subject) => subject.id !== subjectId)
+      );
+
+      return {
+        success: true,
+        message: data.message || 'Materia eliminata con successo.'
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message || 'Si e verificato un errore durante l eliminazione.'
+      };
+    }
+  }
+
   async function refreshCurrentUser() {
     const token = getStoredToken();
 
     if (!token) {
       setCurrentUser(null);
+      setSubjects([]);
       setSettings((currentSettings) => ({
         ...DEFAULT_SETTINGS,
         theme: currentSettings.theme
@@ -135,9 +294,11 @@ export function StudyDataProvider({ children }) {
       });
       setCurrentUser(data.user);
       setSettings(buildSettingsFromUser(data.user));
+      await refreshSubjects();
     } catch (error) {
       clearAuthSession();
       setCurrentUser(null);
+      setSubjects([]);
       setSettings((currentSettings) => ({
         ...DEFAULT_SETTINGS,
         theme: currentSettings.theme
@@ -254,14 +415,19 @@ export function StudyDataProvider({ children }) {
       tasks,
       currentUser,
       isUserLoading,
+      isSubjectsLoading,
       settings,
       addTask,
       updateTask,
       deleteTask,
+      addSubject,
+      updateSubject,
+      deleteSubject,
       refreshCurrentUser,
+      refreshSubjects,
       updateSettings
     }),
-    [currentUser, exams, isUserLoading, settings, subjects, tasks]
+    [currentUser, exams, isSubjectsLoading, isUserLoading, settings, subjects, tasks]
   );
 
   return <StudyDataContext.Provider value={value}>{children}</StudyDataContext.Provider>;
