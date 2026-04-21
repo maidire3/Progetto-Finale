@@ -1,0 +1,316 @@
+body[data-theme='dark'] {
+  color: #e2e8f0;
+  background:
+    radial-gradient(circle at top, rgba(16, 185, 129, 0.16), transparent 30%),
+    linear-gradient(180deg, #08111b 0%, #101a29 100%);
+}
+
+body[data-theme='dark'] .landing-page,
+body[data-theme='dark'] .auth-page {
+  color: #e2e8f0;
+}
+
+body[data-theme='dark'] .button--secondary,
+body[data-theme='dark'] .button--ghost,
+body[data-theme='dark'] .auth-card,
+body[data-theme='dark'] .hero-card,
+body[data-theme='dark'] .feature-card,
+body[data-theme='dark'] .dashboard-shell__main,
+body[data-theme='dark'] .dashboard-summary-card,
+body[data-theme='dark'] .dashboard-linked-card,
+body[data-theme='dark'] .dashboard-linked-item,
+body[data-theme='dark'] .section-card,
+body[data-theme='dark'] .settings-card,
+body[data-theme='dark'] .section-list__item,
+body[data-theme='dark'] .subject-card__schedule,
+body[data-theme='dark'] .subject-card__pill,
+body[data-theme='dark'] .subject-card__icon-button,
+body[data-theme='dark'] .subject-card__text-button,
+body[data-theme='dark'] .entity-modal,
+body[data-theme='dark'] .subject-modal,
+body[data-theme='dark'] .task-panel-trigger,
+body[data-theme='dark'] .task-sidebar,
+body[data-theme='dark'] .task-sidebar__close,
+body[data-theme='dark'] .task-sidebar__form,
+body[data-theme='dark'] .task-sidebar__item,
+body[data-theme='dark'] .task-sidebar__action-button,
+body[data-theme='dark'] .weekly-calendar__toolbar,
+body[data-theme='dark'] .weekly-calendar__grid,
+body[data-theme='dark'] .weekly-calendar__corner,
+body[data-theme='dark'] .weekly-calendar__time-column,
+body[data-theme='dark'] .weekly-calendar__day-header,
+body[data-theme='dark'] .user-badge,
+body[data-theme='dark'] .user-menu,
+body[data-theme='dark'] .topbar {
+  border-color: rgba(71, 85, 105, 0.45);
+  background: rgba(15, 23, 42, 0.88);
+  box-shadow: 0 20px 50px rgba(2, 6, 23, 0.35);
+}
+
+body[data-theme='dark'] .sidebar {
+  border-right-color: rgba(71, 85, 105, 0.35);
+  background: #0f1722;
+}
+
+body[data-theme='dark'] .dashboard-shell {
+  background: #0b1220;
+}
+
+body[data-theme='dark'] .topbar,
+body[data-theme='dark'] .weekly-calendar__day-header,
+body[data-theme='dark'] .weekly-calendar__corner,
+body[data-theme='dark'] .weekly-calendar__time-column {
+  backdrop-filter: blur(12px);
+}
+
+body[data-theme='dark'] .dashboard-linked-item--exam,
+body[data-theme='dark'] .task-sidebar__item--completed {
+  background: rgba(30, 41, 59, 0.96);
+}
+
+body[data-theme='dark'] .subject-card--sage {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.94) 0%, rgba(18, 40, 33, 0.96) 100%);
+}
+
+body[data-theme='dark'] .subject-card--sky {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.94) 0%, rgba(18, 34, 53, 0.96) 100%);
+}
+
+body[data-theme='dark'] .subject-card--sand {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.94) 0%, rgba(51, 34, 18, 0.96) 100%);
+}
+
+body[data-theme='dark'] .subject-card--rose {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.94) 0%, rgba(52, 24, 39, 0.96) 100%);
+}
+
+body[data-theme='dark'] .sidebar__brand-name,
+body[data-theme='dark'] .topbar__title,
+body[data-theme='dark'] .user-badge,
+body[data-theme='dark'] .dashboard-summary-card h3,
+body[data-theme='dark'] .dashboard-linked-card h3,
+body[data-theme='dark'] .dashboard-linked-item__title,
+body[data-theme='dark'] .dashboard-placeholder__intro h2,
+body[data-theme='dark'] .section-page__intro h2,
+body[data-theme='dark'] .section-card h3,
+body[data-theme='dark'] .section-list__item h3,
+body[data-theme='dark'] .settings-card__header h3,
+body[data-theme='dark'] .settings-field span,
+body[data-theme='dark'] .subject-card__schedule-value,
+body[data-theme='dark'] .entity-modal__header h3,
+body[data-theme='dark'] .entity-form__group label,
+body[data-theme='dark'] .task-sidebar__header h2,
+body[data-theme='dark'] .task-panel-trigger__title,
+body[data-theme='dark'] .task-sidebar__item-title,
+body[data-theme='dark'] .weekly-calendar__toolbar-nav p,
+body[data-theme='dark'] .weekly-calendar__day-number,
+body[data-theme='dark'] .calendar-task-block h4,
+body[data-theme='dark'] .hero h1,
+body[data-theme='dark'] .section-heading h2,
+body[data-theme='dark'] .feature-card h3,
+body[data-theme='dark'] .hero-card h2,
+body[data-theme='dark'] .auth-card__header h1,
+body[data-theme='dark'] .auth-form__group label {
+  color: #f8fafc;
+}
+
+body[data-theme='dark'] .sidebar__brand-caption,
+body[data-theme='dark'] .sidebar__section-title,
+body[data-theme='dark'] .topbar__eyebrow,
+body[data-theme='dark'] .user-badge__role,
+body[data-theme='dark'] .user-badge__chevron,
+body[data-theme='dark'] .dashboard-summary-card p:last-child,
+body[data-theme='dark'] .dashboard-linked-item__meta,
+body[data-theme='dark'] .dashboard-placeholder__intro p,
+body[data-theme='dark'] .section-page__intro p,
+body[data-theme='dark'] .section-card p,
+body[data-theme='dark'] .section-list__item p,
+body[data-theme='dark'] .settings-card__description,
+body[data-theme='dark'] .subject-card__schedule-label,
+body[data-theme='dark'] .section-list__meta,
+body[data-theme='dark'] .task-sidebar__description,
+body[data-theme='dark'] .task-sidebar__count,
+body[data-theme='dark'] .task-sidebar__item-meta,
+body[data-theme='dark'] .weekly-calendar__day-name,
+body[data-theme='dark'] .weekly-calendar__time-slot,
+body[data-theme='dark'] .calendar-task-block__subject,
+body[data-theme='dark'] .calendar-task-block__time,
+body[data-theme='dark'] .hero__subtitle,
+body[data-theme='dark'] .feature-card p,
+body[data-theme='dark'] .hero-card p,
+body[data-theme='dark'] .footer,
+body[data-theme='dark'] .auth-card__header p,
+body[data-theme='dark'] .auth-card__footer {
+  color: #94a3b8;
+}
+
+body[data-theme='dark'] .dashboard-summary-card__label,
+body[data-theme='dark'] .dashboard-linked-card__label,
+body[data-theme='dark'] .dashboard-placeholder__eyebrow,
+body[data-theme='dark'] .section-card__label,
+body[data-theme='dark'] .task-panel-trigger__eyebrow,
+body[data-theme='dark'] .task-sidebar__eyebrow,
+body[data-theme='dark'] .weekly-calendar__today-label,
+body[data-theme='dark'] .hero__eyebrow,
+body[data-theme='dark'] .section-heading__eyebrow {
+  color: #86efac;
+}
+
+body[data-theme='dark'] .sidebar__item,
+body[data-theme='dark'] .user-menu__item,
+body[data-theme='dark'] .entity-action-button,
+body[data-theme='dark'] .task-sidebar__close,
+body[data-theme='dark'] .task-sidebar__action-button,
+body[data-theme='dark'] .weekly-calendar__toolbar button {
+  color: #cbd5e1;
+}
+
+body[data-theme='dark'] .weekly-calendar__toolbar button {
+  border-color: rgba(100, 116, 139, 0.52);
+  background: rgba(30, 41, 59, 0.96);
+  color: #f8fafc;
+}
+
+body[data-theme='dark'] .sidebar__item:hover,
+body[data-theme='dark'] .user-menu__item:hover,
+body[data-theme='dark'] .weekly-calendar__toolbar button:hover,
+body[data-theme='dark'] .task-sidebar__action-button:hover,
+body[data-theme='dark'] .task-sidebar__close:hover {
+  background: rgba(30, 41, 59, 0.95);
+}
+
+body[data-theme='dark'] .weekly-calendar__toolbar button:hover {
+  border-color: rgba(134, 239, 172, 0.42);
+  background: rgba(21, 128, 61, 0.22);
+  color: #ffffff;
+}
+
+body[data-theme='dark'] .sidebar__item--active {
+  background: rgba(15, 23, 42, 0.98);
+  color: #f8fafc;
+  box-shadow: inset 3px 0 0 #4ade80;
+}
+
+body[data-theme='dark'] .dashboard-linked-card__badge,
+body[data-theme='dark'] .dashboard-linked-item__pill,
+body[data-theme='dark'] .section-status,
+body[data-theme='dark'] .task-panel-trigger__icon,
+body[data-theme='dark'] .user-badge__avatar {
+  background: rgba(22, 101, 52, 0.24);
+  color: #86efac;
+}
+
+body[data-theme='dark'] .section-status--date {
+  background: rgba(30, 41, 59, 0.9);
+  color: #cbd5e1;
+}
+
+body[data-theme='dark'] .settings-field input,
+body[data-theme='dark'] .settings-field select,
+body[data-theme='dark'] .entity-form__group input,
+body[data-theme='dark'] .entity-form__group select,
+body[data-theme='dark'] .entity-form__group textarea,
+body[data-theme='dark'] .task-sidebar__form-group input,
+body[data-theme='dark'] .task-sidebar__form-group select,
+body[data-theme='dark'] .auth-form__group input {
+  border-color: rgba(71, 85, 105, 0.55);
+  background: rgba(15, 23, 42, 0.9);
+  color: #f8fafc;
+}
+
+body[data-theme='dark'] .auth-form__group input::placeholder {
+  color: #64748b;
+}
+
+body[data-theme='dark'] .subject-form__button--secondary,
+body[data-theme='dark'] .entity-form__button--secondary,
+body[data-theme='dark'] .button--secondary,
+body[data-theme='dark'] .button--ghost {
+  background: rgba(30, 41, 59, 0.98);
+  color: #e2e8f0;
+  border-color: rgba(71, 85, 105, 0.55);
+}
+
+body[data-theme='dark'] .section-page__primary-action,
+body[data-theme='dark'] .subject-form__button,
+body[data-theme='dark'] .entity-form__button,
+body[data-theme='dark'] .task-sidebar__primary-button,
+body[data-theme='dark'] .task-sidebar__submit,
+body[data-theme='dark'] .button--primary,
+body[data-theme='dark'] .auth-form__submit {
+  background: linear-gradient(135deg, #166534, #15803d);
+  box-shadow: 0 14px 34px rgba(22, 101, 52, 0.32);
+}
+
+body[data-theme='dark'] .auth-form__error {
+  background: rgba(30, 41, 59, 0.96);
+  border-color: rgba(96, 165, 250, 0.35);
+  color: #93c5fd;
+}
+
+body[data-theme='dark'] .entity-modal-backdrop {
+  background: rgba(2, 6, 23, 0.62);
+  backdrop-filter: blur(8px);
+}
+
+body[data-theme='dark'] .feature-card__icon {
+  background: linear-gradient(135deg, #166534, #22c55e);
+}
+
+body[data-theme='dark'] .hero-card__label {
+  background: rgba(22, 101, 52, 0.22);
+  color: #86efac;
+}
+
+body[data-theme='dark'] .footer {
+  border-top-color: rgba(71, 85, 105, 0.4);
+}
+
+body[data-theme='dark'] .topbar,
+body[data-theme='dark'] .weekly-calendar__toolbar,
+body[data-theme='dark'] .weekly-calendar__grid,
+body[data-theme='dark'] .weekly-calendar__day-column,
+body[data-theme='dark'] .weekly-calendar__corner,
+body[data-theme='dark'] .weekly-calendar__time-column {
+  border-color: rgba(71, 85, 105, 0.32);
+}
+
+body[data-theme='dark'] .weekly-calendar__day-column {
+  background: rgba(15, 23, 42, 0.74);
+}
+
+body[data-theme='dark'] .weekly-calendar__day-column--today {
+  background: linear-gradient(180deg, rgba(17, 65, 45, 0.55) 0%, rgba(15, 23, 42, 0.84) 100%);
+}
+
+body[data-theme='dark'] .weekly-calendar__day-column--today .weekly-calendar__day-header {
+  background: rgba(16, 47, 36, 0.92);
+}
+
+body[data-theme='dark'] .weekly-calendar__hour-row,
+body[data-theme='dark'] .weekly-calendar__time-slot,
+body[data-theme='dark'] .weekly-calendar__corner,
+body[data-theme='dark'] .weekly-calendar__day-header {
+  border-bottom-color: rgba(71, 85, 105, 0.32);
+}
+
+body[data-theme='dark'] .weekly-calendar__hour-row:hover {
+  background: rgba(22, 101, 52, 0.15);
+}
+
+body[data-theme='dark'] .calendar-task-block {
+  color: #0f172a;
+  box-shadow: 0 12px 28px rgba(2, 6, 23, 0.4);
+}
+
+body[data-theme='dark'] .calendar-task-block h4 {
+  color: #020617;
+}
+
+body[data-theme='dark'] .calendar-task-block__subject {
+  color: #334155;
+}
+
+body[data-theme='dark'] .calendar-task-block__time {
+  color: #475569;
+}
