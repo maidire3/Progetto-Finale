@@ -26,6 +26,7 @@ body[data-theme='dark'] .subject-card__schedule,
 body[data-theme='dark'] .subject-card__pill,
 body[data-theme='dark'] .subject-card__icon-button,
 body[data-theme='dark'] .subject-card__text-button,
+body[data-theme='dark'] .entity-action-button,
 body[data-theme='dark'] .entity-modal,
 body[data-theme='dark'] .subject-modal,
 body[data-theme='dark'] .task-panel-trigger,
@@ -159,6 +160,8 @@ body[data-theme='dark'] .section-heading__eyebrow {
 body[data-theme='dark'] .sidebar__item,
 body[data-theme='dark'] .user-menu__item,
 body[data-theme='dark'] .entity-action-button,
+body[data-theme='dark'] .subject-card__icon-button,
+body[data-theme='dark'] .subject-card__text-button,
 body[data-theme='dark'] .task-sidebar__close,
 body[data-theme='dark'] .task-sidebar__action-button,
 body[data-theme='dark'] .weekly-calendar__toolbar button {
@@ -173,10 +176,17 @@ body[data-theme='dark'] .weekly-calendar__toolbar button {
 
 body[data-theme='dark'] .sidebar__item:hover,
 body[data-theme='dark'] .user-menu__item:hover,
+body[data-theme='dark'] .entity-action-button:hover,
+body[data-theme='dark'] .subject-card__icon-button:hover,
+body[data-theme='dark'] .subject-card__text-button:hover,
 body[data-theme='dark'] .weekly-calendar__toolbar button:hover,
 body[data-theme='dark'] .task-sidebar__action-button:hover,
 body[data-theme='dark'] .task-sidebar__close:hover {
   background: rgba(30, 41, 59, 0.95);
+}
+
+body[data-theme='dark'] .entity-action-button__icon {
+  filter: brightness(0) invert(0.9);
 }
 
 body[data-theme='dark'] .weekly-calendar__toolbar button:hover {

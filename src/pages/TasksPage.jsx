@@ -1,4 +1,6 @@
 import React, { useMemo, useState } from 'react';
+import deleteIcon from '../assets/icons8-delete-48.png';
+import settingsIcon from '../assets/icons8-settings-50.png';
 import TaskModal from '../components/dashboard/TaskModal';
 import DashboardSectionLayout from '../components/layout/DashboardSectionLayout';
 import { INITIAL_SUBJECTS } from '../data/studyData';
@@ -168,15 +170,25 @@ function TasksPage() {
                   className="entity-action-button"
                   type="button"
                   onClick={() => openEditModal(task)}
+                  aria-label={`Modifica ${task.title}`}
                 >
-                  Modifica
+                  <img
+                    alt=""
+                    className="entity-action-button__icon"
+                    src={settingsIcon}
+                  />
                 </button>
                 <button
                   className="entity-action-button entity-action-button--danger"
                   type="button"
                   onClick={() => handleDeleteTask(task.id)}
+                  aria-label={`Elimina ${task.title}`}
                 >
-                  Elimina
+                  <img
+                    alt=""
+                    className="entity-action-button__icon"
+                    src={deleteIcon}
+                  />
                 </button>
               </div>
             </article>

@@ -1,4 +1,6 @@
 import React, { useMemo, useState } from 'react';
+import deleteIcon from '../assets/icons8-delete-48.png';
+import settingsIcon from '../assets/icons8-settings-50.png';
 import DashboardSectionLayout from '../components/layout/DashboardSectionLayout';
 import '../styles/dashboard.css';
 import '../styles/sidebar.css';
@@ -148,15 +150,25 @@ function NotesPage() {
                   className="entity-action-button"
                   type="button"
                   onClick={() => openEditModal(note)}
+                  aria-label={`Modifica ${note.title}`}
                 >
-                  Modifica
+                  <img
+                    alt=""
+                    className="entity-action-button__icon"
+                    src={settingsIcon}
+                  />
                 </button>
                 <button
                   className="entity-action-button entity-action-button--danger"
                   type="button"
                   onClick={() => handleDeleteNote(note.id)}
+                  aria-label={`Elimina ${note.title}`}
                 >
-                  Elimina
+                  <img
+                    alt=""
+                    className="entity-action-button__icon"
+                    src={deleteIcon}
+                  />
                 </button>
               </div>
             </article>

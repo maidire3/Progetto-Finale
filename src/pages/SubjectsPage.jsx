@@ -1,4 +1,6 @@
 import React, { useMemo, useState } from 'react';
+import deleteIcon from '../assets/icons8-delete-48.png';
+import settingsIcon from '../assets/icons8-settings-50.png';
 import DashboardSectionLayout from '../components/layout/DashboardSectionLayout';
 import { useStudyData } from '../context/StudyDataContext';
 import {
@@ -197,7 +199,11 @@ function SubjectsPage() {
                     type="button"
                     onClick={() => openEditModal(subject)}
                   >
-                    ingranaggio
+                    <img
+                      alt=""
+                      className="entity-action-button__icon"
+                      src={settingsIcon}
+                    />
                   </button>
                   <button
                     aria-label={`Elimina ${subject.name}`}
@@ -205,7 +211,11 @@ function SubjectsPage() {
                     type="button"
                     onClick={() => handleDeleteSubject(subject.id)}
                   >
-                    Elimina
+                    <img
+                      alt=""
+                      className="entity-action-button__icon"
+                      src={deleteIcon}
+                    />
                   </button>
                 </div>
               </div>
