@@ -13,7 +13,6 @@ pnpm-debug.log*
 
 # environment files
 .env
-.env.*
 
 # editor and OS files
 .DS_Store
