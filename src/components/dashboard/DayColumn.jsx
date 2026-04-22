@@ -1,7 +1,14 @@
 import React from 'react';
 import TaskBlock from './TaskBlock';
 
-function DayColumn({ day, hours, calendarStartHour, onSlotClick, onTaskClick }) {
+function DayColumn({
+  day,
+  hours,
+  calendarStartHour,
+  onSlotClick,
+  onTaskClick,
+  slotHeight
+}) {
   return (
     <div
       className={`weekly-calendar__day-column ${
@@ -36,6 +43,7 @@ function DayColumn({ day, hours, calendarStartHour, onSlotClick, onTaskClick }) 
               calendarStartHour={calendarStartHour}
               key={task.id}
               onClick={onTaskClick}
+              slotHeight={slotHeight}
               task={task}
             />
           ))}

@@ -1,6 +1,7 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import DayColumn from './DayColumn';
 import {
+  CALENDAR_MOBILE_SLOT_HEIGHT,
   CALENDAR_SLOT_HEIGHT,
   CALENDAR_TASK_INSET_BOTTOM,
   CALENDAR_TASK_INSET_SIDE,
@@ -166,6 +167,9 @@ function WeeklyCalendar({
 }) {
   const { addTask, settings, updateTask } = useStudyData();
   const [weekOffset, setWeekOffset] = useState(0);
+  const [isMobileCalendar, setIsMobileCalendar] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth <= 768 : false
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [formValues, setFormValues] = useState({
@@ -204,6 +208,28 @@ function WeeklyCalendar({
   );
   const weekLabel = getWeekLabel(days);
   const subjectOptions = getTaskSubjectOptions(subjects);
+  const slotHeight = isMobileCalendar
+    ? CALENDAR_MOBILE_SLOT_HEIGHT
+    : CALENDAR_SLOT_HEIGHT;
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return undefined;
+    }
+
+    const mediaQuery = window.matchMedia('(max-width: 768px)');
+
+    function handleViewportChange(event) {
+      setIsMobileCalendar(event.matches);
+    }
+
+    setIsMobileCalendar(mediaQuery.matches);
+    mediaQuery.addEventListener('change', handleViewportChange);
+
+    return () => {
+      mediaQuery.removeEventListener('change', handleViewportChange);
+    };
+  }, []);
 
   function openCreateModal(dateValue, hour) {
     setEditingTaskId(null);
@@ -330,7 +356,7 @@ function WeeklyCalendar({
       <section
         className="weekly-calendar"
         style={{
-          '--calendar-slot-height': `${CALENDAR_SLOT_HEIGHT}px`,
+          '--calendar-slot-height': `${slotHeight}px`,
           '--calendar-task-inset-top': `${CALENDAR_TASK_INSET_TOP}px`,
           '--calendar-task-inset-side': `${CALENDAR_TASK_INSET_SIDE}px`,
           '--calendar-task-inset-bottom': `${CALENDAR_TASK_INSET_BOTTOM}px`
@@ -356,19 +382,22 @@ function WeeklyCalendar({
           </button>
         </div>
 
-        <div className="weekly-calendar__grid">
-          <TimeColumn hours={hours} />
+        <div className="weekly-calendar__viewport">
+          <div className="weekly-calendar__grid">
+            <TimeColumn hours={hours} />
 
-          {days.map((day) => (
-            <DayColumn
-              calendarStartHour={plannerStartHour}
-              day={day}
-              hours={hours}
-              key={day.key}
-              onSlotClick={openCreateModal}
-              onTaskClick={openEditModal}
-            />
-          ))}
+            {days.map((day) => (
+              <DayColumn
+                calendarStartHour={plannerStartHour}
+                day={day}
+                hours={hours}
+                key={day.key}
+                onSlotClick={openCreateModal}
+                onTaskClick={openEditModal}
+                slotHeight={slotHeight}
+              />
+            ))}
+          </div>
         </div>
       </section>
 

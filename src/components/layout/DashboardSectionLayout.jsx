@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useStudyData } from '../../context/StudyDataContext';
 import AppShell from './AppShell';
 import sidebarSections from '../../data/mockNavigation';
@@ -13,13 +13,13 @@ function DashboardSectionLayout({
   const { currentUser } = useStudyData();
   const user = formatUserForBadge(currentUser);
 
-  function handleOpenTaskPanel() {
+  const handleOpenTaskPanel = useCallback(() => {
     setIsTaskPanelOpen(true);
-  }
+  }, []);
 
-  function handleCloseTaskPanel() {
+  const handleCloseTaskPanel = useCallback(() => {
     setIsTaskPanelOpen(false);
-  }
+  }, []);
 
   return (
     <AppShell

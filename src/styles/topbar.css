@@ -8,8 +8,53 @@
   background: rgba(255, 255, 255, 0.8);
 }
 
-.topbar > div:last-child {
+.topbar__mobile-left,
+.topbar__actions {
+  display: flex;
+  align-items: center;
+}
+
+.topbar__mobile-left {
+  gap: 16px;
+  min-width: 0;
+}
+
+.topbar__actions {
+  gap: 12px;
+}
+
+.topbar > div:last-child,
+.topbar__actions {
   position: relative;
+}
+
+.topbar__icon-button {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 14px;
+  background: #ffffff;
+  color: #0f172a;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.topbar__icon-button span {
+  display: block;
+  width: 16px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.topbar__icon-button--menu,
+.topbar__icon-button--task {
+  flex-direction: column;
+  gap: 4px;
 }
 
 .topbar__eyebrow,
@@ -117,4 +162,47 @@
 
 .user-menu__item--danger {
   color: #b45309;
+}
+
+@media (max-width: 768px) {
+  .topbar {
+    padding: 18px 16px;
+    gap: 12px;
+  }
+
+  .topbar__icon-button {
+    display: inline-flex;
+  }
+
+  .topbar__eyebrow {
+    font-size: 0.76rem;
+  }
+
+  .topbar__title {
+    margin-top: 4px;
+    font-size: 1.4rem;
+  }
+
+  .user-badge {
+    gap: 8px;
+    padding: 8px 10px;
+  }
+
+  .user-badge__avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .user-badge__name {
+    font-size: 0.96rem;
+  }
+
+  .user-badge__role {
+    display: none;
+  }
+
+  .user-menu {
+    right: 0;
+    min-width: 170px;
+  }
 }

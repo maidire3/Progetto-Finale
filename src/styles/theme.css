@@ -180,9 +180,10 @@ body[data-theme='dark'] .section-heading__eyebrow {
 
 body[data-theme='dark'] .sidebar__item,
 body[data-theme='dark'] .user-menu__item,
-body[data-theme='dark'] .entity-action-button,
-body[data-theme='dark'] .subject-card__icon-button,
-body[data-theme='dark'] .subject-card__text-button,
+body[data-theme='dark'] .topbar__icon-button,
+  body[data-theme='dark'] .entity-action-button,
+  body[data-theme='dark'] .subject-card__icon-button,
+  body[data-theme='dark'] .subject-card__text-button,
 body[data-theme='dark'] .task-sidebar__close,
 body[data-theme='dark'] .task-sidebar__action-button,
 body[data-theme='dark'] .weekly-calendar__toolbar button {
@@ -197,6 +198,7 @@ body[data-theme='dark'] .weekly-calendar__toolbar button {
 
 body[data-theme='dark'] .sidebar__item:hover,
 body[data-theme='dark'] .user-menu__item:hover,
+body[data-theme='dark'] .topbar__icon-button:hover,
 body[data-theme='dark'] .entity-action-button:hover,
 body[data-theme='dark'] .subject-card__icon-button:hover,
 body[data-theme='dark'] .subject-card__text-button:hover,

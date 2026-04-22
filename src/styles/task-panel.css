@@ -307,3 +307,47 @@
 .task-sidebar__action-button--danger {
   color: #b45309;
 }
+
+@media (max-width: 768px) {
+  .task-panel-trigger {
+    display: none;
+  }
+
+  .task-panel-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.42);
+    z-index: 28;
+  }
+
+  .task-sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: min(88vw, 360px);
+    max-height: 100vh;
+    min-height: 100vh;
+    padding: 20px 16px 24px;
+    border-radius: 0;
+    transform: translateX(100%);
+    z-index: 29;
+  }
+
+  .task-sidebar--open {
+    transform: translateX(0);
+  }
+
+  .task-sidebar__header h2 {
+    font-size: 1.24rem;
+  }
+
+  .task-sidebar__actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .task-sidebar__primary-button,
+  .task-sidebar__submit {
+    width: 100%;
+  }
+}

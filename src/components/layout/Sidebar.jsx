@@ -2,9 +2,16 @@ import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import sidebarLogo from '../../assets/Logo.png';
 
-function Sidebar({ sections }) {
+function Sidebar({ sections, isOpen = false, onClose }) {
   return (
-    <aside className="sidebar">
+    <>
+      <div
+        className={`sidebar__overlay ${isOpen ? 'sidebar__overlay--visible' : ''}`}
+        role="presentation"
+        onClick={onClose}
+      />
+
+      <aside className={`sidebar ${isOpen ? 'sidebar--open' : ''}`}>
       <Link className="sidebar__brand" to="/dashboard">
         <img
           className="sidebar__brand-mark"
@@ -13,7 +20,7 @@ function Sidebar({ sections }) {
         />
         <div>
           <p className="sidebar__brand-name">Study Tracker</p>
-          <p className="sidebar__brand-caption">Desktop dashboard</p>
+          <p className="sidebar__brand-caption">Dashboard</p>
         </div>
       </Link>
 
@@ -30,6 +37,7 @@ function Sidebar({ sections }) {
                       `sidebar__item ${isActive ? 'sidebar__item--active' : ''}`
                     }
                     to={item.path}
+                    onClick={onClose}
                   >
                     {item.label}
                   </NavLink>
@@ -39,7 +47,8 @@ function Sidebar({ sections }) {
           </div>
         ))}
       </nav>
-    </aside>
+      </aside>
+    </>
   );
 }
 

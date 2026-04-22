@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
@@ -16,14 +16,39 @@ function AppShell({
 }) {
   const location = useLocation();
   const showTaskPanel = location.pathname === '/dashboard';
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    setIsSidebarOpen(false);
+    onCloseTaskPanel();
+  }, [location.pathname, onCloseTaskPanel]);
+
+  function handleOpenSidebar() {
+    setIsSidebarOpen(true);
+  }
+
+  function handleCloseSidebar() {
+    setIsSidebarOpen(false);
+  }
 
   return (
     <div className="dashboard-shell">
-      <Sidebar sections={sidebarSections} />
+      <Sidebar
+        isOpen={isSidebarOpen}
+        sections={sidebarSections}
+        onClose={handleCloseSidebar}
+      />
 
       <div className="dashboard-shell__workspace">
         <main className="dashboard-shell__main">
-          <Topbar user={user} title={topbarTitle} eyebrow={topbarEyebrow} />
+          <Topbar
+            eyebrow={topbarEyebrow}
+            title={topbarTitle}
+            user={user}
+            showTaskPanelControl={showTaskPanel}
+            onOpenSidebar={handleOpenSidebar}
+            onOpenTaskPanel={onOpenTaskPanel}
+          />
           <div className="dashboard-shell__content">{children}</div>
         </main>
 

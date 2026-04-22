@@ -1,16 +1,15 @@
 import React from 'react';
 import {
-  CALENDAR_SLOT_HEIGHT,
   CALENDAR_TASK_INSET_BOTTOM,
   CALENDAR_TASK_INSET_TOP
 } from './calendarLayout';
 
-function TaskBlock({ task, calendarStartHour, onClick }) {
-  const top = (task.startHour - calendarStartHour) * CALENDAR_SLOT_HEIGHT;
+function TaskBlock({ task, calendarStartHour, onClick, slotHeight }) {
+  const top = (task.startHour - calendarStartHour) * slotHeight;
   const height = Math.max(
-    (task.endHour - task.startHour) * CALENDAR_SLOT_HEIGHT -
+    (task.endHour - task.startHour) * slotHeight -
       (CALENDAR_TASK_INSET_TOP + CALENDAR_TASK_INSET_BOTTOM),
-    44
+    slotHeight <= 58 ? 36 : 44
   );
 
   return (
