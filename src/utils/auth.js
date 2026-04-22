@@ -53,15 +53,15 @@ function getStoredThemePreference() {
   const rawPreferences = localStorage.getItem(PREFERENCES_KEY);
 
   if (!rawPreferences) {
-    return 'Scuro';
+    return 'Sistema';
   }
 
   try {
     const parsedPreferences = JSON.parse(rawPreferences);
-    return parsedPreferences.theme || 'Scuro';
+    return parsedPreferences.theme || 'Sistema';
   } catch (error) {
     localStorage.removeItem(PREFERENCES_KEY);
-    return 'Scuro';
+    return 'Sistema';
   }
 }
 

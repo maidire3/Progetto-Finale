@@ -18,7 +18,7 @@ const DEFAULT_SETTINGS = {
   school: '',
   courseOfStudy: '',
   language: 'it',
-  theme: 'Scuro',
+  theme: 'Sistema',
   weekStart: 'monday',
   plannerStartHour: '06:00',
   plannerEndHour: '22:00'
@@ -42,6 +42,10 @@ function buildSettingsFromUser(user, theme = getStoredThemePreference()) {
 function resolveThemeValue(theme) {
   if (theme === 'Scuro') {
     return 'dark';
+  }
+
+  if (theme === 'Chiaro') {
+    return 'light';
   }
 
   if (theme === 'Sistema' && typeof window !== 'undefined' && window.matchMedia) {
