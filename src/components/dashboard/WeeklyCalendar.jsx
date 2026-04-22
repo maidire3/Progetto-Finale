@@ -1,5 +1,11 @@
 import React, { useMemo, useState } from 'react';
 import DayColumn from './DayColumn';
+import {
+  CALENDAR_SLOT_HEIGHT,
+  CALENDAR_TASK_INSET_BOTTOM,
+  CALENDAR_TASK_INSET_SIDE,
+  CALENDAR_TASK_INSET_TOP
+} from './calendarLayout';
 import TaskModal from './TaskModal';
 import TimeColumn from './TimeColumn';
 import { useStudyData } from '../../context/StudyDataContext';
@@ -321,7 +327,15 @@ function WeeklyCalendar({
 
   return (
     <>
-      <section className="weekly-calendar">
+      <section
+        className="weekly-calendar"
+        style={{
+          '--calendar-slot-height': `${CALENDAR_SLOT_HEIGHT}px`,
+          '--calendar-task-inset-top': `${CALENDAR_TASK_INSET_TOP}px`,
+          '--calendar-task-inset-side': `${CALENDAR_TASK_INSET_SIDE}px`,
+          '--calendar-task-inset-bottom': `${CALENDAR_TASK_INSET_BOTTOM}px`
+        }}
+      >
         <div className="weekly-calendar__toolbar">
           <div className="weekly-calendar__toolbar-nav">
             <button type="button" onClick={handlePreviousWeek}>

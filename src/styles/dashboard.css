@@ -1241,11 +1241,15 @@
 }
 
 .weekly-calendar {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  min-height: 580px;
-}
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    min-height: 580px;
+    --calendar-slot-height: 66px;
+    --calendar-task-inset-top: 8px;
+    --calendar-task-inset-side: 8px;
+    --calendar-task-inset-bottom: 6px;
+  }
 
 .weekly-calendar__toolbar,
 .weekly-calendar__grid {
@@ -1336,9 +1340,9 @@
 }
 
 .weekly-calendar__time-slot {
-  height: 66px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.09);
-}
+    height: var(--calendar-slot-height);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.09);
+  }
 
 .weekly-calendar__time-slot {
   display: flex;
@@ -1422,12 +1426,12 @@
 }
 
 .weekly-calendar__hour-row {
-  display: block;
-  box-sizing: border-box;
-  width: 100%;
-  height: 66px;
-  margin: 0;
-  padding: 0;
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    height: var(--calendar-slot-height);
+    margin: 0;
+    padding: 0;
   appearance: none;
   -webkit-appearance: none;
   border: 0;
@@ -1444,20 +1448,24 @@
 }
 
 .weekly-calendar__task-layer {
-  position: absolute;
-  inset: 0;
-  padding: 8px;
-  pointer-events: none;
-}
+    position: absolute;
+    inset: 0;
+    padding: var(--calendar-task-inset-top) var(--calendar-task-inset-side)
+      var(--calendar-task-inset-bottom);
+    pointer-events: none;
+  }
 
 .calendar-task-block {
-  position: absolute;
-  z-index: 1;
-  left: 8px;
-  right: 8px;
-  padding: 12px 12px 11px;
-  appearance: none;
-  -webkit-appearance: none;
+    position: absolute;
+    z-index: 1;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 8px 12px 9px;
+    appearance: none;
+    -webkit-appearance: none;
   border-radius: 18px;
   border: 1px solid rgba(148, 163, 184, 0.14);
   text-align: left;
@@ -1474,25 +1482,27 @@
 }
 
 .calendar-task-block__subject {
-  margin-top: 5px;
-  color: #5f6f82;
-  font-size: 0.76rem;
-  font-weight: 600;
-}
+    margin-top: 2px;
+    color: #5f6f82;
+    font-size: 0.76rem;
+    font-weight: 600;
+    line-height: 1.2;
+  }
 
 .calendar-task-block h4 {
-  color: #0f172a;
-  font-size: 0.9rem;
-  font-weight: 700;
-  line-height: 1.35;
-}
+    color: #0f172a;
+    font-size: 0.9rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
 
 .calendar-task-block__time {
-  margin-top: 8px;
-  color: #7b8798;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
+    margin-top: 4px;
+    color: #7b8798;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.15;
+  }
 
 .weekly-calendar__modal {
   width: min(100%, 680px);

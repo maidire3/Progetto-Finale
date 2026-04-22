@@ -1,9 +1,17 @@
 import React from 'react';
-const HOUR_HEIGHT = 64;
+import {
+  CALENDAR_SLOT_HEIGHT,
+  CALENDAR_TASK_INSET_BOTTOM,
+  CALENDAR_TASK_INSET_TOP
+} from './calendarLayout';
 
 function TaskBlock({ task, calendarStartHour, onClick }) {
-  const top = (task.startHour - calendarStartHour) * HOUR_HEIGHT + 8;
-  const height = Math.max((task.endHour - task.startHour) * HOUR_HEIGHT - 12, 44);
+  const top = (task.startHour - calendarStartHour) * CALENDAR_SLOT_HEIGHT;
+  const height = Math.max(
+    (task.endHour - task.startHour) * CALENDAR_SLOT_HEIGHT -
+      (CALENDAR_TASK_INSET_TOP + CALENDAR_TASK_INSET_BOTTOM),
+    44
+  );
 
   return (
     <button
