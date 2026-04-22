@@ -1105,7 +1105,15 @@
 
 .entity-form__actions {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.entity-form__actions-left,
+.entity-form__actions-right {
+  display: flex;
+  align-items: center;
   gap: 12px;
 }
 
@@ -1137,6 +1145,18 @@
 .entity-form__button--secondary {
   background: #e2e8f0;
   color: #0f172a;
+}
+
+.entity-form__button--danger {
+  background: #dc2626;
+  color: #ffffff;
+  box-shadow: 0 14px 30px rgba(220, 38, 38, 0.18);
+}
+
+.entity-form__button--danger:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 .entity-modal__close {

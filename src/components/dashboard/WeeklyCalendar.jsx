@@ -165,7 +165,7 @@ function WeeklyCalendar({
   tasks = INITIAL_TASKS,
   subjects = []
 }) {
-  const { addTask, settings, updateTask } = useStudyData();
+  const { addTask, deleteTask, settings, updateTask } = useStudyData();
   const [weekOffset, setWeekOffset] = useState(0);
   const [isMobileCalendar, setIsMobileCalendar] = useState(() =>
     typeof window !== 'undefined' ? window.innerWidth <= 768 : false
@@ -183,6 +183,7 @@ function WeeklyCalendar({
   });
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const plannerStartHour = useMemo(
     () => parseHourValue(settings.plannerStartHour, 6),
     [settings.plannerStartHour]
@@ -278,6 +279,7 @@ function WeeklyCalendar({
       notes: ''
     });
     setFeedbackMessage('');
+    setIsDeleting(false);
   }
 
   function handlePreviousWeek() {
@@ -351,6 +353,29 @@ function WeeklyCalendar({
     closeModal();
   }
 
+  async function handleDeleteFromModal() {
+    const taskToDelete = tasks.find((task) => task.id === editingTaskId);
+
+    if (!taskToDelete) {
+      return;
+    }
+
+    if (!window.confirm(`Vuoi eliminare il task "${taskToDelete.title}"?`)) {
+      return;
+    }
+
+    setIsDeleting(true);
+    const result = await deleteTask(editingTaskId);
+    setIsDeleting(false);
+
+    if (!result.success) {
+      setFeedbackMessage(result.message);
+      return;
+    }
+
+    closeModal();
+  }
+
   return (
     <>
       <section
@@ -405,9 +430,11 @@ function WeeklyCalendar({
         editingTask={editingTaskId}
         feedbackMessage={feedbackMessage}
         formValues={formValues}
+        isDeleting={isDeleting}
         isOpen={isModalOpen}
         isSubmitting={isSubmitting}
         onClose={closeModal}
+        onDelete={handleDeleteFromModal}
         onFieldChange={handleFieldChange}
         onSubmit={handleSubmit}
         subjectOptions={subjectOptions}

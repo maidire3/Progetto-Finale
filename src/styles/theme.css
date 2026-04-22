@@ -289,6 +289,16 @@ body[data-theme='dark'] .auth-form__submit {
   box-shadow: 0 14px 34px rgba(22, 101, 52, 0.32);
 }
 
+body[data-theme='dark'] .entity-form__button--danger {
+  background: #dc2626;
+  color: #ffffff;
+  box-shadow: 0 14px 30px rgba(220, 38, 38, 0.24);
+}
+
+body[data-theme='dark'] .entity-form__button--danger:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
 body[data-theme='dark'] .auth-form__error {
   background: rgba(30, 41, 59, 0.96);
   border-color: rgba(96, 165, 250, 0.35);

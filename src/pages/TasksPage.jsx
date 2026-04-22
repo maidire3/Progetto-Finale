@@ -41,6 +41,7 @@ function TasksPage() {
   const [formValues, setFormValues] = useState(getEmptyTaskForm(subjectOptions));
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const editingTask = useMemo(
     () => tasks.find((task) => task.id === editingTaskId) || null,
@@ -95,6 +96,7 @@ function TasksPage() {
     setEditingTaskId(null);
     setFormValues(getEmptyTaskForm(subjectOptions));
     setFeedbackMessage('');
+    setIsDeleting(false);
     setIsModalOpen(false);
   }
 
@@ -168,6 +170,27 @@ function TasksPage() {
     if (!result.success) {
       window.alert(result.message);
     }
+  }
+
+  async function handleDeleteFromModal() {
+    if (!editingTask) {
+      return;
+    }
+
+    if (!window.confirm(`Vuoi eliminare il task "${editingTask.title}"?`)) {
+      return;
+    }
+
+    setIsDeleting(true);
+    const result = await deleteTask(editingTask.id);
+    setIsDeleting(false);
+
+    if (!result.success) {
+      setFeedbackMessage(result.message);
+      return;
+    }
+
+    closeModal();
   }
 
   return (
@@ -258,9 +281,11 @@ function TasksPage() {
         editingTask={editingTask}
         feedbackMessage={feedbackMessage}
         formValues={formValues}
+        isDeleting={isDeleting}
         isOpen={isModalOpen}
         isSubmitting={isSubmitting}
         onClose={closeModal}
+        onDelete={handleDeleteFromModal}
         onFieldChange={handleFieldChange}
         onSubmit={handleSubmit}
         subjectOptions={subjectOptions}

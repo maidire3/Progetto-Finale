@@ -7,7 +7,9 @@ function TaskModal({
   feedbackMessage = '',
   formValues,
   isSubmitting = false,
+  isDeleting = false,
   onClose,
+  onDelete,
   onFieldChange,
   onSubmit,
   subjectOptions
@@ -145,20 +147,40 @@ function TaskModal({
           ) : null}
 
           <div className="entity-form__actions">
-            <button
-              className="entity-form__button entity-form__button--secondary"
-              type="button"
-              onClick={onClose}
-            >
-              Annulla
-            </button>
-            <button className="entity-form__button" type="submit" disabled={isSubmitting}>
-              {isSubmitting
-                ? 'Salvataggio...'
-                : editingTask
-                  ? 'Salva modifiche'
-                  : 'Aggiungi task'}
-            </button>
+            <div className="entity-form__actions-left">
+              {editingTask ? (
+                <button
+                  className="entity-form__button entity-form__button--danger"
+                  type="button"
+                  onClick={onDelete}
+                  disabled={isSubmitting || isDeleting}
+                >
+                  {isDeleting ? 'Eliminazione...' : 'Elimina'}
+                </button>
+              ) : null}
+            </div>
+
+            <div className="entity-form__actions-right">
+              <button
+                className="entity-form__button entity-form__button--secondary"
+                type="button"
+                onClick={onClose}
+                disabled={isSubmitting || isDeleting}
+              >
+                Annulla
+              </button>
+              <button
+                className="entity-form__button"
+                type="submit"
+                disabled={isSubmitting || isDeleting}
+              >
+                {isSubmitting
+                  ? 'Salvataggio...'
+                  : editingTask
+                    ? 'Salva modifiche'
+                    : 'Aggiungi task'}
+              </button>
+            </div>
           </div>
         </form>
       </div>
