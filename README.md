@@ -4,6 +4,21 @@ Study Tracker e una web app pensata per aiutare studenti universitari a organizz
 
 Il progetto e nato come progetto finale frontend, ma nel tempo e stato esteso con un backend Node.js + Express + MongoDB per gestire autenticazione e dati reali per utente.
 
+Frontend visionabile su Netlify: https://creative-entremet-c8df0d.netlify.app/
+Backend su OnRender: https://progetto-finale-ff13.onrender.com/
+
+⚠️ Nota importante (Backend)
+
+Il backend è deployato su Render (piano gratuito), quindi va in sleep dopo un periodo di inattività.
+
+👉 Prima di utilizzare l’app:
+
+Apri il link del backend: https://progetto-finale-ff13.onrender.com/
+Attendi qualche secondo che il server si riattivi
+Poi utilizza normalmente il frontend
+
+⚡ Senza questo passaggio, login/registrazione e le funzionalità principali potrebbero non funzionare. 
+
 ## Obiettivo del progetto
 
 L'idea alla base di Study Tracker e offrire uno spazio unico dove:
