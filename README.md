@@ -221,6 +221,7 @@ La UI e stata sviluppata con un approccio progressivo:
 ## Possibili sviluppi futuri
 
 - miglioramento responsive delle altre pagine oltre la dashboard
+- verifica dell’account tramite email (email di conferma alla registrazione)
 - filtri e ordinamenti piu avanzati
 - validazioni piu forti lato backend
 - gestione globale dei 401 lato frontend
