@@ -4,11 +4,22 @@ function notFound(req, res, next) {
 }
 
 function errorHandler(err, req, res, next) {
-  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+  let statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+  let message = err.message || 'Errore del server.';
 
-  res.status(statusCode).json({
-    message: err.message || 'Errore del server.'
-  });
+  if (err.name === 'CastError') {
+    statusCode = 400;
+    message = 'Identificatore non valido.';
+  }
+
+  if (err.name === 'ValidationError') {
+    statusCode = 400;
+    message = Object.values(err.errors)
+      .map((validationError) => validationError.message)
+      .join(' ');
+  }
+
+  res.status(statusCode).json({ message });
 }
 
 export { notFound, errorHandler };

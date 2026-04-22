@@ -6,14 +6,17 @@ import sanitizeUser from '../utils/sanitizeUser.js';
 async function registerUser(req, res, next) {
   try {
     const { firstName, lastName, email, password } = req.body;
+    const normalizedFirstName = firstName?.trim() || '';
+    const normalizedLastName = lastName?.trim() || '';
+    const normalizedEmail = email?.trim().toLowerCase() || '';
 
-    if (!firstName || !lastName || !email || !password) {
+    if (!normalizedFirstName || !normalizedLastName || !normalizedEmail || !password) {
       return res.status(400).json({
         message: 'firstName, lastName, email e password sono obbligatori.'
       });
     }
 
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    const existingUser = await User.findOne({ email: normalizedEmail });
 
     if (existingUser) {
       return res.status(400).json({ message: 'Esiste gia un account con questa email.' });
@@ -22,9 +25,9 @@ async function registerUser(req, res, next) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
-      firstName,
-      lastName,
-      email,
+      firstName: normalizedFirstName,
+      lastName: normalizedLastName,
+      email: normalizedEmail,
       password: hashedPassword
     });
 
@@ -41,12 +44,13 @@ async function registerUser(req, res, next) {
 async function loginUser(req, res, next) {
   try {
     const { email, password } = req.body;
+    const normalizedEmail = email?.trim().toLowerCase() || '';
 
-    if (!email || !password) {
+    if (!normalizedEmail || !password) {
       return res.status(400).json({ message: 'Email e password sono obbligatorie.' });
     }
 
-    const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
+    const user = await User.findOne({ email: normalizedEmail }).select('+password');
 
     if (!user) {
       return res.status(401).json({ message: 'Credenziali non valide.' });

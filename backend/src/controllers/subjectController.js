@@ -35,6 +35,7 @@ async function createSubject(req, res, next) {
   try {
     const {
       name,
+      description = '',
       color = 'sage',
       scheduleEnabled = false,
       scheduleDays = [],
@@ -60,7 +61,7 @@ async function createSubject(req, res, next) {
     const subject = await Subject.create({
       user: req.user._id,
       name: trimmedName,
-      description: buildDefaultDescription(trimmedName),
+      description: description?.trim() || buildDefaultDescription(trimmedName),
       color,
       scheduleEnabled,
       scheduleDays: scheduleEnabled ? scheduleDays : [],
@@ -81,6 +82,7 @@ async function updateSubject(req, res, next) {
   try {
     const {
       name,
+      description = '',
       color = 'sage',
       scheduleEnabled = false,
       scheduleDays = [],
@@ -113,7 +115,7 @@ async function updateSubject(req, res, next) {
     }
 
     subject.name = trimmedName;
-    subject.description = buildDefaultDescription(trimmedName);
+    subject.description = description?.trim() || buildDefaultDescription(trimmedName);
     subject.color = color;
     subject.scheduleEnabled = scheduleEnabled;
     subject.scheduleDays = scheduleEnabled ? scheduleDays : [];

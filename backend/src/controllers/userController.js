@@ -18,15 +18,17 @@ async function updateCurrentUser(req, res, next) {
       plannerStartHour,
       plannerEndHour
     } = req.body;
+    const normalizedFirstName = firstName?.trim() || '';
+    const normalizedLastName = lastName?.trim() || '';
 
-    if (!firstName || !lastName) {
+    if (!normalizedFirstName || !normalizedLastName) {
       return res.status(400).json({
         message: 'Nome e cognome sono obbligatori.'
       });
     }
 
-    req.user.firstName = firstName.trim();
-    req.user.lastName = lastName.trim();
+    req.user.firstName = normalizedFirstName;
+    req.user.lastName = normalizedLastName;
     req.user.school = school?.trim() || '';
     req.user.courseOfStudy = courseOfStudy?.trim() || '';
     req.user.language = language || 'it';

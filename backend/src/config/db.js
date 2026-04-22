@@ -16,16 +16,11 @@ function configureDnsServers() {
 }
 
 async function connectDB() {
-  try {
-    configureDnsServers();
-    await mongoose.connect(process.env.MONGODB_URI, {
-      serverSelectionTimeoutMS: 10000
-    });
-    console.log('MongoDB connected');
-  } catch (error) {
-    console.error('MongoDB connection error:', error.message);
-    process.exit(1);
-  }
+  configureDnsServers();
+  await mongoose.connect(process.env.MONGODB_URI, {
+    serverSelectionTimeoutMS: 10000
+  });
+  console.log('MongoDB connected');
 }
 
 export default connectDB;
