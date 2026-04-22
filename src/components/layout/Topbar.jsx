@@ -1,4 +1,5 @@
 import React from 'react';
+import { MoreVertical } from 'lucide-react';
 import UserBadge from './UserBadge';
 
 function Topbar({
@@ -23,13 +24,15 @@ function Topbar({
           <span />
         </button>
 
-        <div>
-        <p className="topbar__eyebrow">{eyebrow}</p>
-        <h1 className="topbar__title">{title}</h1>
+        <div className="topbar__title-group">
+          <p className="topbar__eyebrow">{eyebrow}</p>
+          <h1 className="topbar__title">{title}</h1>
         </div>
       </div>
 
       <div className="topbar__actions">
+        <UserBadge user={user} />
+
         {showTaskPanelControl ? (
           <button
             className="topbar__icon-button topbar__icon-button--task"
@@ -37,13 +40,9 @@ function Topbar({
             aria-label="Apri task panel"
             onClick={onOpenTaskPanel}
           >
-            <span />
-            <span />
-            <span />
+            <MoreVertical aria-hidden="true" className="topbar__icon-svg" size={18} />
           </button>
         ) : null}
-
-        <UserBadge user={user} />
       </div>
     </header>
   );
