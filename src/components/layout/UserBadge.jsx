@@ -37,7 +37,10 @@ function UserBadge({ user }) {
   }
 
   return (
-    <div className="user-badge-wrapper" ref={badgeRef}>
+    <div
+      className={`user-badge-wrapper ${isMenuOpen ? 'user-badge-wrapper--open' : ''}`}
+      ref={badgeRef}
+    >
       <button
         aria-expanded={isMenuOpen}
         className={`user-badge ${isMenuOpen ? 'user-badge--open' : ''}`}

@@ -57,7 +57,6 @@ body[data-theme='dark'] .dashboard-shell {
   background: #0b1220;
 }
 
-body[data-theme='dark'] .topbar,
 body[data-theme='dark'] .weekly-calendar__day-header,
 body[data-theme='dark'] .weekly-calendar__corner,
 body[data-theme='dark'] .weekly-calendar__time-column {
