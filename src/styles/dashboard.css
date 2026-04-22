@@ -124,8 +124,19 @@
   background: #f8faf7;
 }
 
+.dashboard-linked-item__content {
+  min-width: 0;
+  flex: 1;
+}
+
 .dashboard-linked-item--exam {
   background: #f7f8fb;
+}
+
+.dashboard-linked-item__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .dashboard-placeholder__intro h2 {

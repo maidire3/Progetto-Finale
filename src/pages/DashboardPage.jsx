@@ -79,8 +79,10 @@ function DashboardPage() {
               <div className="dashboard-linked-list">
                 {subjects.map((subject) => (
                   <div className="dashboard-linked-item" key={subject.id}>
-                    <div>
-                      <p className="dashboard-linked-item__title">{subject.name}</p>
+                    <div className="dashboard-linked-item__content">
+                      <p className="dashboard-linked-item__title" title={subject.name}>
+                        {subject.name}
+                      </p>
                       <p className="dashboard-linked-item__meta">
                         {formatSubjectSchedule(subject)}
                       </p>
@@ -104,8 +106,10 @@ function DashboardPage() {
               <div className="dashboard-linked-list">
                 {openTasks.slice(0, 3).map((task) => (
                   <div className="dashboard-linked-item" key={task.id}>
-                    <div>
-                      <p className="dashboard-linked-item__title">{task.title}</p>
+                    <div className="dashboard-linked-item__content">
+                      <p className="dashboard-linked-item__title" title={task.title}>
+                        {task.title}
+                      </p>
                       <p className="dashboard-linked-item__meta">
                         {task.dueDate
                           ? `${task.subject} - Scadenza ${task.dueDate}${
@@ -122,8 +126,10 @@ function DashboardPage() {
 
                 {nextExam ? (
                   <div className="dashboard-linked-item dashboard-linked-item--exam">
-                    <div>
-                      <p className="dashboard-linked-item__title">{nextExam.subject}</p>
+                    <div className="dashboard-linked-item__content">
+                      <p className="dashboard-linked-item__title" title={nextExam.subject}>
+                        {nextExam.subject}
+                      </p>
                       <p className="dashboard-linked-item__meta">
                         {nextExam.date} - {nextExam.location}
                       </p>
@@ -132,8 +138,13 @@ function DashboardPage() {
                   </div>
                 ) : (
                   <div className="dashboard-linked-item dashboard-linked-item--exam">
-                    <div>
-                      <p className="dashboard-linked-item__title">Nessun esame in programma</p>
+                    <div className="dashboard-linked-item__content">
+                      <p
+                        className="dashboard-linked-item__title"
+                        title="Nessun esame in programma"
+                      >
+                        Nessun esame in programma
+                      </p>
                       <p className="dashboard-linked-item__meta">
                         Aggiungi un esame per vederlo qui in dashboard.
                       </p>
