@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/auth.css';
+import { useStudyData } from '../context/StudyDataContext';
 import { API_BASE_URL, saveAuthSession } from '../utils/auth';
 
 function LoginPage() {
   const navigate = useNavigate();
+  const { refreshCurrentUser } = useStudyData();
   const [formValues, setFormValues] = useState({
     email: '',
     password: ''
@@ -55,6 +57,7 @@ function LoginPage() {
         user: data.user
       });
 
+      await refreshCurrentUser();
       navigate('/dashboard');
     } catch (error) {
       setFeedbackMessage(error.message || 'Si e verificato un errore durante il login.');
