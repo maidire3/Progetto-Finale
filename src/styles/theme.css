@@ -250,6 +250,12 @@ body[data-theme='dark'] .auth-form__group input {
   color: #f8fafc;
 }
 
+body[data-theme='dark'] .task-sidebar__form,
+body[data-theme='dark'] .task-sidebar__form-group label,
+body[data-theme='dark'] .task-sidebar__item-title {
+  color: #ffffff;
+}
+
 body[data-theme='dark'] .subject-color-picker {
   border-color: rgba(71, 85, 105, 0.55);
   background: rgba(15, 23, 42, 0.9);
