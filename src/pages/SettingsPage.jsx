@@ -132,7 +132,6 @@ function SettingsPage() {
                   onChange={handleFieldChange}
                 >
                   <option value="it">Italiano</option>
-                  <option value="en">English</option>
                 </select>
               </label>
 

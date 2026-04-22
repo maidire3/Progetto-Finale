@@ -66,14 +66,6 @@ function UserBadge({ user }) {
           <Link
             className="user-menu__item"
             role="menuitem"
-            to="/settings#profile"
-            onClick={handleCloseMenu}
-          >
-            Profilo
-          </Link>
-          <Link
-            className="user-menu__item"
-            role="menuitem"
             to="/settings"
             onClick={handleCloseMenu}
           >
