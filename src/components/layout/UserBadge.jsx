@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { clearAuthSession } from '../../utils/auth';
+import { useStudyData } from '../../context/StudyDataContext';
 
 function UserBadge({ user }) {
   const navigate = useNavigate();
+  const { logoutUser } = useStudyData();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const badgeRef = useRef(null);
 
@@ -30,7 +31,7 @@ function UserBadge({ user }) {
   }
 
   function handleLogout() {
-    clearAuthSession();
+    logoutUser();
     handleCloseMenu();
     navigate('/login');
   }

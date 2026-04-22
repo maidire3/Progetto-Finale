@@ -97,6 +97,28 @@ export function StudyDataProvider({ children }) {
   const [isExamsLoading, setIsExamsLoading] = useState(Boolean(getStoredToken()));
   const [isNotesLoading, setIsNotesLoading] = useState(Boolean(getStoredToken()));
 
+  function resetSessionState() {
+    setCurrentUser(null);
+    setSubjects([]);
+    setTasks([]);
+    setExams([]);
+    setNotes([]);
+    setSettings((currentSettings) => ({
+      ...DEFAULT_SETTINGS,
+      theme: currentSettings.theme
+    }));
+    setIsUserLoading(false);
+    setIsSubjectsLoading(false);
+    setIsTasksLoading(false);
+    setIsExamsLoading(false);
+    setIsNotesLoading(false);
+  }
+
+  function logoutUser() {
+    clearAuthSession();
+    resetSessionState();
+  }
+
   async function refreshSubjects() {
     const token = getStoredToken();
 
@@ -809,16 +831,7 @@ export function StudyDataProvider({ children }) {
     const token = getStoredToken();
 
     if (!token) {
-      setCurrentUser(null);
-      setSubjects([]);
-      setTasks([]);
-      setExams([]);
-      setNotes([]);
-      setSettings((currentSettings) => ({
-        ...DEFAULT_SETTINGS,
-        theme: currentSettings.theme
-      }));
-      setIsUserLoading(false);
+      resetSessionState();
       return;
     }
 
@@ -846,15 +859,7 @@ export function StudyDataProvider({ children }) {
       await Promise.all([refreshSubjects(), refreshTasks(), refreshExams(), refreshNotes()]);
     } catch (error) {
       clearAuthSession();
-      setCurrentUser(null);
-      setSubjects([]);
-      setTasks([]);
-      setExams([]);
-      setNotes([]);
-      setSettings((currentSettings) => ({
-        ...DEFAULT_SETTINGS,
-        theme: currentSettings.theme
-      }));
+      resetSessionState();
     } finally {
       setIsUserLoading(false);
     }
@@ -991,7 +996,8 @@ export function StudyDataProvider({ children }) {
       refreshTasks,
       refreshExams,
       refreshNotes,
-      updateSettings
+      updateSettings,
+      logoutUser
     }),
     [
       currentUser,

@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import '../styles/auth.css';
 import { useStudyData } from '../context/StudyDataContext';
 import { API_BASE_URL, saveAuthSession } from '../utils/auth';
 
 function RegisterPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { refreshCurrentUser } = useStudyData();
   const [formValues, setFormValues] = useState({
     firstName: '',
@@ -68,7 +69,7 @@ function RegisterPage() {
       });
 
       await refreshCurrentUser();
-      navigate('/dashboard');
+      navigate(location.state?.from || '/dashboard', { replace: true });
     } catch (error) {
       setFeedbackMessage(error.message || 'Si e verificato un errore durante la registrazione.');
     } finally {

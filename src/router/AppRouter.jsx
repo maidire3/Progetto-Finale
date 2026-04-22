@@ -11,22 +11,29 @@ import ExamsPage from '../pages/ExamsPage';
 import NotesPage from '../pages/NotesPage';
 import NoteDetailPage from '../pages/NoteDetailPage';
 import SettingsPage from '../pages/SettingsPage';
+import { ProtectedRoute, PublicOnlyRoute } from './RouteGuards';
 
 function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/search" element={<SearchPage />} />
-        <Route path="/subjects" element={<SubjectsPage />} />
-        <Route path="/tasks" element={<TasksPage />} />
-        <Route path="/exams" element={<ExamsPage />} />
-        <Route path="/notes" element={<NotesPage />} />
-        <Route path="/notes/:id" element={<NoteDetailPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
+
+        <Route element={<PublicOnlyRoute />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+        </Route>
+
+        <Route element={<ProtectedRoute />}>
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/subjects" element={<SubjectsPage />} />
+          <Route path="/tasks" element={<TasksPage />} />
+          <Route path="/exams" element={<ExamsPage />} />
+          <Route path="/notes" element={<NotesPage />} />
+          <Route path="/notes/:id" element={<NoteDetailPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );
