@@ -1,5 +1,5 @@
 function validateEnv() {
-  const requiredVariables = ['MONGODB_URI', 'JWT_SECRET'];
+  const requiredVariables = ['MONGODB_URI', 'JWT_SECRET', 'CLIENT_URL'];
   const missingVariables = requiredVariables.filter(
     (variableName) => !process.env[variableName]?.trim()
   );

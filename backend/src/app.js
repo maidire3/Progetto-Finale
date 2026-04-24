@@ -12,12 +12,25 @@ import { errorHandler, notFound } from './middleware/errorMiddleware.js';
 dotenv.config();
 
 const app = express();
+const allowedOrigins = (process.env.CLIENT_URL || '').split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
 app.set('trust proxy', 1);
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || '*'
+    origin(origin, callback) {
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error('Origine non autorizzata dal CORS.'));
+    }
   })
 );
 app.use(express.json());
