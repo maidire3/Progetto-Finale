@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import helmet from 'helmet';
 import authRoutes from './routes/authRoutes.js';
 import examRoutes from './routes/examRoutes.js';
 import noteRoutes from './routes/noteRoutes.js';
@@ -17,6 +18,7 @@ const allowedOrigins = (process.env.CLIENT_URL || '').split(',')
   .filter(Boolean);
 
 app.set('trust proxy', 1);
+app.use(helmet());
 
 app.use(
   cors({
