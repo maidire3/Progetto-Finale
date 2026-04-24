@@ -37,6 +37,7 @@ const userSchema = new mongoose.Schema(
     language: {
       type: String,
       default: 'it',
+      enum: ['it'],
       trim: true
     },
     theme: {
@@ -47,16 +48,19 @@ const userSchema = new mongoose.Schema(
     weekStart: {
       type: String,
       default: 'monday',
+      enum: ['monday', 'sunday'],
       trim: true
     },
     plannerStartHour: {
       type: String,
       default: '06:00',
+      match: /^([01]\d|2[0-3]):([0-5]\d)$/,
       trim: true
     },
     plannerEndHour: {
       type: String,
       default: '22:00',
+      match: /^([01]\d|2[0-3]):([0-5]\d)$/,
       trim: true
     }
   },

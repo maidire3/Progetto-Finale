@@ -1,4 +1,8 @@
 import Task from '../models/Task.js';
+import {
+  isValidTaskStatus,
+  normalizeHourValue
+} from '../utils/fieldValidation.js';
 
 function sanitizeTask(task) {
   return {
@@ -41,10 +45,49 @@ async function createTask(req, res, next) {
 
     const trimmedTitle = title?.trim();
     const trimmedSubject = subject?.trim();
+    const normalizedStartHour = normalizeHourValue(startHour);
+    const normalizedEndHour = normalizeHourValue(endHour);
 
     if (!trimmedTitle || !trimmedSubject) {
       return res.status(400).json({
         message: 'Titolo e materia sono obbligatori.'
+      });
+    }
+
+    if (!isValidTaskStatus(status)) {
+      return res.status(400).json({
+        message: 'Lo stato della task non e valido.'
+      });
+    }
+
+    if (
+      Number.isNaN(normalizedStartHour) ||
+      Number.isNaN(normalizedEndHour) ||
+      normalizedStartHour < 0 ||
+      normalizedEndHour < 0 ||
+      normalizedStartHour > 24 ||
+      normalizedEndHour > 24
+    ) {
+      return res.status(400).json({
+        message: 'Gli orari della task non sono validi.'
+      });
+    }
+
+    if (
+      (normalizedStartHour === null) !== (normalizedEndHour === null)
+    ) {
+      return res.status(400).json({
+        message: 'Per pianificare una task servono sia ora di inizio sia ora di fine.'
+      });
+    }
+
+    if (
+      normalizedStartHour !== null &&
+      normalizedEndHour !== null &&
+      normalizedEndHour <= normalizedStartHour
+    ) {
+      return res.status(400).json({
+        message: 'L ora di fine deve essere successiva all ora di inizio.'
       });
     }
 
@@ -55,8 +98,8 @@ async function createTask(req, res, next) {
       status,
       notes: notes?.trim() || '',
       dueDate: dueDate?.trim() || '',
-      startHour: Number.isFinite(startHour) ? startHour : null,
-      endHour: Number.isFinite(endHour) ? endHour : null
+      startHour: normalizedStartHour,
+      endHour: normalizedEndHour
     });
 
     return res.status(201).json({
@@ -82,10 +125,49 @@ async function updateTask(req, res, next) {
 
     const trimmedTitle = title?.trim();
     const trimmedSubject = subject?.trim();
+    const normalizedStartHour = normalizeHourValue(startHour);
+    const normalizedEndHour = normalizeHourValue(endHour);
 
     if (!trimmedTitle || !trimmedSubject) {
       return res.status(400).json({
         message: 'Titolo e materia sono obbligatori.'
+      });
+    }
+
+    if (!isValidTaskStatus(status)) {
+      return res.status(400).json({
+        message: 'Lo stato della task non e valido.'
+      });
+    }
+
+    if (
+      Number.isNaN(normalizedStartHour) ||
+      Number.isNaN(normalizedEndHour) ||
+      normalizedStartHour < 0 ||
+      normalizedEndHour < 0 ||
+      normalizedStartHour > 24 ||
+      normalizedEndHour > 24
+    ) {
+      return res.status(400).json({
+        message: 'Gli orari della task non sono validi.'
+      });
+    }
+
+    if (
+      (normalizedStartHour === null) !== (normalizedEndHour === null)
+    ) {
+      return res.status(400).json({
+        message: 'Per pianificare una task servono sia ora di inizio sia ora di fine.'
+      });
+    }
+
+    if (
+      normalizedStartHour !== null &&
+      normalizedEndHour !== null &&
+      normalizedEndHour <= normalizedStartHour
+    ) {
+      return res.status(400).json({
+        message: 'L ora di fine deve essere successiva all ora di inizio.'
       });
     }
 
@@ -103,8 +185,8 @@ async function updateTask(req, res, next) {
     task.status = status;
     task.notes = notes?.trim() || '';
     task.dueDate = dueDate?.trim() || '';
-    task.startHour = Number.isFinite(startHour) ? startHour : null;
-    task.endHour = Number.isFinite(endHour) ? endHour : null;
+    task.startHour = normalizedStartHour;
+    task.endHour = normalizedEndHour;
 
     const updatedTask = await task.save();
 
