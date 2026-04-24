@@ -4,21 +4,24 @@ Study Tracker e una web app pensata per aiutare studenti universitari a organizz
 
 Il progetto e nato come progetto finale frontend, ma nel tempo e stato esteso con un backend Node.js + Express + MongoDB per gestire autenticazione e dati reali per utente.
 
-Frontend visionabile su Netlify: https://creative-entremet-c8df0d.netlify.app/
+Frontend online su Netlify:
+[https://creative-entremet-c8df0d.netlify.app/](https://creative-entremet-c8df0d.netlify.app/)
 
-Backend su OnRender: https://progetto-finale-ff13.onrender.com/
+Backend online su Render:
+[https://progetto-finale-ff13.onrender.com/](https://progetto-finale-ff13.onrender.com/)
 
-⚠️ Nota importante (Backend)
+## Nota importante sul backend deployato
 
-Il backend è deployato su Render (piano gratuito), quindi va in sleep dopo un periodo di inattività.
+Il backend e deployato su Render piano gratuito, quindi puo andare in sleep dopo un periodo di inattivita.
 
-👉 Prima di utilizzare l’app:
+Prima di usare l'app online:
 
-Apri il link del backend: https://progetto-finale-ff13.onrender.com/
-Attendi qualche secondo che il server si riattivi
-Poi utilizza normalmente il frontend
+1. apri il backend
+   [https://progetto-finale-ff13.onrender.com/api/health](https://progetto-finale-ff13.onrender.com/api/health)
+2. attendi qualche secondo che il server si riattivi
+3. usa normalmente il frontend
 
-⚡ Senza questo passaggio, login/registrazione e le funzionalità principali potrebbero non funzionare. 
+Senza questo passaggio, login, registrazione e chiamate API potrebbero fallire al primo tentativo.
 
 ## Obiettivo del progetto
 
@@ -103,29 +106,31 @@ L'interfaccia e stata progettata con uno stile moderno, dark mode inclusa, con u
 - bcrypt
 - dotenv
 - cors
+- helmet
+- express-rate-limit
 
 ## Struttura del progetto
 
 ```text
 Progetto Finale/
-├─ src/
-│  ├─ components/
-│  ├─ context/
-│  ├─ pages/
-│  ├─ router/
-│  ├─ styles/
-│  └─ utils/
-├─ backend/
-│  ├─ src/
-│  │  ├─ config/
-│  │  ├─ controllers/
-│  │  ├─ middleware/
-│  │  ├─ models/
-│  │  ├─ routes/
-│  │  └─ utils/
-│  └─ .env.example
-├─ package.json
-└─ README.md
+|-- src/
+|   |-- components/
+|   |-- context/
+|   |-- pages/
+|   |-- router/
+|   |-- styles/
+|   `-- utils/
+|-- backend/
+|   |-- src/
+|   |   |-- config/
+|   |   |-- controllers/
+|   |   |-- middleware/
+|   |   |-- models/
+|   |   |-- routes/
+|   |   `-- utils/
+|   `-- .env.example
+|-- package.json
+`-- README.md
 ```
 
 ## Stato attuale del progetto
@@ -133,7 +138,7 @@ Progetto Finale/
 Attualmente il progetto ha:
 
 - frontend e backend separati
-- autenticazione completa base
+- autenticazione base completa
 - route protette lato frontend e backend
 - CRUD reali per:
   - user settings
@@ -142,7 +147,28 @@ Attualmente il progetto ha:
   - exams
   - notes
 
-Le sezioni principali sono gia collegate al database e filtrate per utente autenticato.
+Le sezioni principali sono collegate al database e filtrate per utente autenticato.
+
+## Sicurezza e robustezza backend
+
+Nelle ultime revisioni il backend e stato reso piu solido con alcune patch mirate:
+
+- rate limiting su `POST /api/auth/login` e `POST /api/auth/register`
+  - riduce il rischio di brute-force e tentativi ripetuti sulle credenziali
+- CORS fail-closed
+  - `CLIENT_URL` e obbligatoria
+  - il backend non usa piu fallback permissivi a `*`
+  - vengono accettate solo le origin configurate
+- validazioni piu strette lato API
+  - `task.status` accetta solo valori ammessi
+  - `language`, `weekStart`, `plannerStartHour` e `plannerEndHour` vengono validati
+  - gli orari task e planner vengono controllati per formato e coerenza
+- header HTTP di sicurezza base con `helmet`
+- filtro dati per utente autenticato su tutte le risorse principali
+- password sempre hashate con `bcrypt`
+- dati sensibili come la password non vengono mai restituiti nelle response
+
+Queste scelte non rendono il progetto "enterprise-ready", ma lo portano a un livello piu robusto e coerente per un progetto finale junior fatto bene.
 
 ## Avvio in locale
 
@@ -177,6 +203,12 @@ Il backend parte di default su:
 http://localhost:5000
 ```
 
+Health check:
+
+```text
+http://localhost:5000/api/health
+```
+
 ## Variabili ambiente backend
 
 Nel file `backend/.env` puoi usare una configurazione di questo tipo:
@@ -187,6 +219,12 @@ MONGODB_URI=mongodb+srv://USERNAME:PASSWORD@cluster0.xxxxx.mongodb.net/study-tra
 JWT_SECRET=una_chiave_jwt_lunga_e_sicura
 CLIENT_URL=http://localhost:5173
 MONGODB_DNS_SERVERS=1.1.1.1,8.8.8.8
+```
+
+In deploy puoi usare anche piu origin separate da virgola per `CLIENT_URL`, ad esempio:
+
+```env
+CLIENT_URL=http://localhost:5173,https://tuo-frontend.netlify.app
 ```
 
 Puoi partire dal file:
@@ -210,7 +248,7 @@ npm run build
 npm start
 ```
 
-## Flusso autenticazione
+## Flusso di autenticazione
 
 Il frontend:
 
@@ -236,13 +274,12 @@ La UI e stata sviluppata con un approccio progressivo:
 
 ## Possibili sviluppi futuri
 
-- sistemi di controllo maggiori per password esempio rate limiting e brute force
+- gestione token piu avanzata con cookie `httpOnly` e refresh token
+- centralizzazione migliore della gestione globale dei `401` lato frontend
 - miglioramento responsive delle altre pagine oltre la dashboard
-- verifica dell’account tramite email (email di conferma alla registrazione)
+- verifica account tramite email
 - filtri e ordinamenti piu avanzati
-- validazioni piu forti lato backend
-- gestione globale dei 401 lato frontend
-- miglioramento UX della sezione search e dashboard
+- audit e hardening sicurezza piu approfonditi
 
 ## Autore
 
