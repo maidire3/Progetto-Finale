@@ -68,6 +68,39 @@
   border-color: #2563eb;
 }
 
+.auth-password-rules {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 2px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.auth-password-rules__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #475569;
+  font-size: 0.92rem;
+}
+
+.auth-password-rules__item--valid {
+  color: #15803d;
+}
+
+.auth-password-rules__item--invalid {
+  color: #b91c1c;
+}
+
+.auth-password-rules__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  flex-shrink: 0;
+}
+
 .auth-form__error {
   min-height: 48px;
   padding: 14px 16px;

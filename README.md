@@ -44,6 +44,7 @@ L'interfaccia e stata progettata con uno stile moderno, dark mode inclusa, con u
 - logout
 - protezione delle route private
 - recupero sessione al refresh
+- validazione password live in registrazione
 
 ### Dashboard
 
@@ -163,6 +164,11 @@ Nelle ultime revisioni il backend e stato reso piu solido con alcune patch mirat
   - `task.status` accetta solo valori ammessi
   - `language`, `weekStart`, `plannerStartHour` e `plannerEndHour` vengono validati
   - gli orari task e planner vengono controllati per formato e coerenza
+- validazione password sia lato frontend sia lato backend
+  - almeno 6 caratteri
+  - almeno una lettera maiuscola
+  - almeno 2 numeri
+  - feedback live in registrazione con requisiti soddisfatti/non soddisfatti
 - header HTTP di sicurezza base con `helmet`
 - filtro dati per utente autenticato su tutte le risorse principali
 - password sempre hashate con `bcrypt`

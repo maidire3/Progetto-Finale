@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import User from '../models/User.js';
 import generateToken from '../utils/generateToken.js';
+import { buildPasswordValidationMessage, isPasswordValid } from '../utils/passwordValidation.js';
 import sanitizeUser from '../utils/sanitizeUser.js';
 
 async function registerUser(req, res, next) {
@@ -13,6 +14,12 @@ async function registerUser(req, res, next) {
     if (!normalizedFirstName || !normalizedLastName || !normalizedEmail || !password) {
       return res.status(400).json({
         message: 'firstName, lastName, email e password sono obbligatori.'
+      });
+    }
+
+    if (!isPasswordValid(password)) {
+      return res.status(400).json({
+        message: buildPasswordValidationMessage(password)
       });
     }
 

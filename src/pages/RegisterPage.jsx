@@ -1,8 +1,13 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import '../styles/auth.css';
 import { useStudyData } from '../context/StudyDataContext';
 import { API_BASE_URL, saveAuthSession } from '../utils/auth';
+import {
+  buildPasswordErrorMessage,
+  getPasswordValidationState,
+  isPasswordValid
+} from '../utils/passwordValidation';
 
 function RegisterPage() {
   const navigate = useNavigate();
@@ -17,6 +22,10 @@ function RegisterPage() {
   });
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const passwordChecks = useMemo(
+    () => getPasswordValidationState(formValues.password),
+    [formValues.password]
+  );
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -38,6 +47,11 @@ function RegisterPage() {
 
     if (formValues.password !== formValues.confirmPassword) {
       setFeedbackMessage('Le password non coincidono.');
+      return;
+    }
+
+    if (!isPasswordValid(formValues.password)) {
+      setFeedbackMessage(buildPasswordErrorMessage(formValues.password));
       return;
     }
 
@@ -138,6 +152,24 @@ function RegisterPage() {
               value={formValues.password}
               onChange={handleChange}
             />
+
+            <ul className="auth-password-rules" aria-live="polite">
+              {passwordChecks.map((requirement) => (
+                <li
+                  className={`auth-password-rules__item ${
+                    requirement.isValid
+                      ? 'auth-password-rules__item--valid'
+                      : 'auth-password-rules__item--invalid'
+                  }`}
+                  key={requirement.key}
+                >
+                  <span className="auth-password-rules__icon" aria-hidden="true">
+                    {requirement.isValid ? '✔️' : '❌'}
+                  </span>
+                  <span>{requirement.label}</span>
+                </li>
+              ))}
+            </ul>
           </div>
 
           <div className="auth-form__group">

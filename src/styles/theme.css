@@ -160,6 +160,7 @@ body[data-theme='dark'] .feature-card p,
 body[data-theme='dark'] .hero-card p,
 body[data-theme='dark'] .footer,
 body[data-theme='dark'] .auth-card__header p,
+body[data-theme='dark'] .auth-password-rules__item,
 body[data-theme='dark'] .auth-card__footer {
   color: #94a3b8;
 }
@@ -308,6 +309,14 @@ body[data-theme='dark'] .auth-form__error {
   background: rgba(30, 41, 59, 0.96);
   border-color: rgba(96, 165, 250, 0.35);
   color: #93c5fd;
+}
+
+body[data-theme='dark'] .auth-password-rules__item--valid {
+  color: #86efac;
+}
+
+body[data-theme='dark'] .auth-password-rules__item--invalid {
+  color: #fca5a5;
 }
 
 body[data-theme='dark'] .entity-modal-backdrop {
